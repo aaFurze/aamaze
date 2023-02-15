@@ -2,8 +2,7 @@ from typing import List
 
 import pygame
 
-from src.base_maze import (BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, TOP_WALL, Maze,
-                           MazeNode)
+from src.base_maze import BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, TOP_WALL, Maze
 
 TARGET_ASPECT_RATIO = [16, 9]
 TARGET_WINDOW_WIDTH = 1280
@@ -59,48 +58,47 @@ class DrawMaze:
          window.get_height())
 
         wall_width = cls._get_wall_width(tile_size)
-        tile_space = cls._get_tile_space(tile_size, wall_width)
         
         for node in maze.maze_body:
             if node.walls & TOP_WALL: 
-                cls.draw_top_wall(window, node.x, node.y, wall_width, tile_size, tile_space)
+                cls.draw_top_wall(window, node.x, node.y, wall_width, tile_size)
             if node.walls & BOTTOM_WALL : 
-                cls.draw_bottom_wall(window, node.x, node.y, wall_width, tile_size, tile_space)
+                cls.draw_bottom_wall(window, node.x, node.y, wall_width, tile_size)
             if node.walls & LEFT_WALL: 
-                cls.draw_left_wall(window, node.x, node.y, wall_width, tile_size, tile_space)
+                cls.draw_left_wall(window, node.x, node.y, wall_width, tile_size)
             if node.walls & RIGHT_WALL: 
-                cls.draw_right_wall(window, node.x, node.y, wall_width, tile_size, tile_space)    
+                cls.draw_right_wall(window, node.x, node.y, wall_width, tile_size)    
 
 
     @staticmethod
     def draw_top_wall(window: pygame.Surface, x: int, y: int, wall_width: int,
-     tile_size: int, tile_space: int):
-        position = [x * tile_size + wall_width, window.get_height() - (y * tile_size) - wall_width]
-        wall_dimensions = [tile_space + wall_width, wall_width]
+     tile_size: int):
+        position = [x * tile_size + wall_width, window.get_height() - ((y + 1) * tile_size) - wall_width]
+        wall_dimensions = [tile_size - wall_width, wall_width]
 
         pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
 
     @staticmethod
     def draw_bottom_wall(window: pygame.Surface, x: int, y: int, wall_width: int,
-     tile_size: int, tile_space: int):
-        position = [x * tile_size + wall_width, window.get_height() - ((y + 1) * tile_size) - wall_width]
-        wall_dimensions = [tile_space + wall_width, wall_width]
+     tile_size: int):
+        position = [x * tile_size + wall_width, window.get_height() - (y * tile_size) - wall_width]
+        wall_dimensions = [tile_size - wall_width, wall_width]
 
         pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
     
     @staticmethod
     def draw_left_wall(window: pygame.Surface, x: int, y: int, wall_width: int,
-     tile_size: int, tile_space: int):
+     tile_size: int):
         position = [x * tile_size, window.get_height() - ((y + 1) * tile_size)]
-        wall_dimensions = [wall_width, tile_space + wall_width]
+        wall_dimensions = [wall_width, tile_size - wall_width]
 
         pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
 
     @staticmethod
     def draw_right_wall(window: pygame.Surface, x: int, y: int, wall_width: int,
-     tile_size: int, tile_space: int):
+     tile_size: int):
         position = [x * tile_size + tile_size, window.get_height() - (y + 1) * tile_size]
-        wall_dimensions = [wall_width, tile_space + wall_width]
+        wall_dimensions = [wall_width, tile_size - wall_width]
 
         pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
 
@@ -108,12 +106,11 @@ class DrawMaze:
     @staticmethod
     def _get_tile_size(maze_width: int, maze_height: int,
      window_width: int, window_height: int) -> int:
-        return max(6, (int(min(window_width / maze_width, window_height / maze_height) - 1)))
+        enforced_padding = max(4, 32 - min(2 * maze_width, 2 * maze_height))
+        
+        return max(6, (int(min((window_width - enforced_padding) / maze_width,
+         (window_height - enforced_padding) / maze_height))))
 
     @staticmethod
     def _get_wall_width(tile_size: int) -> int:
         return max(2, (tile_size // 16) * 2)
-    
-    @staticmethod
-    def _get_tile_space(tile_size: int, wall_width: int) -> int:
-        return tile_size - (wall_width * 2)
