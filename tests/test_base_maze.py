@@ -62,6 +62,16 @@ class TestMaze:
         assert neighbours[neighbour_index].x == expected_x
         assert neighbours[neighbour_index].y == expected_y
 
+    @pytest.mark.parametrize("x, y", [(0, 1), (1, 2), (3, 4), (4, 5), (3, 3)])
+    def test_get_node_valid_input(self, mock_maze: Maze, x, y):
+        node = mock_maze.get_node(x, y)
+        assert node.x == x
+        assert node.y == y
+
+    @pytest.mark.parametrize("x, y", [(-1, 1), (100, 200), (3, 400), (40, 5), (-456546, -5)])
+    def test_get_node_invalid_input(self, mock_maze: Maze, x, y):
+        node = mock_maze.get_node(x, y)
+        assert node is None
 
 
 class TestMazeNode:

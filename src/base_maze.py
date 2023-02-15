@@ -54,6 +54,13 @@ class Maze():
         self.maze_body: List[MazeNode] = self.generate_blank_maze(self.w, self.h)
 
     
+    def get_node(self, x: int, y: int) -> Union[MazeNode, None]:
+        if x < 0 or x >= self.w: return None
+        if y < 0 or y >= self.h: return None
+
+        return self.maze_body[(y * self.w) + x]
+
+
     def generate_blank_maze(self, width: int, height: int) -> List[MazeNode]:
         output = []
 
