@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Dict, List, Union
 
@@ -9,6 +11,7 @@ RIGHT_WALL = 0b00000001
 
 
 class MazeNode:
+
 
     def __init__(self, x: int, y: int, walls: int) -> None:
         self.x = x
@@ -23,23 +26,28 @@ class MazeNode:
         output["right"] = bool(self.walls & RIGHT_WALL)
 
         return output
+    
+    def __repr__(self) -> str:
+        return f"MazeNode(x={self.x}, y={self.y}, walls={self.walls})"
 
 
 
 class GenerationAlgorithm(ABC):
+    def __init__(self, maze: Maze) -> None:
+        self.maze = maze
 
-    @classmethod
     @abstractmethod
-    def generate_maze(cls, maze_body: List[MazeNode]) -> List[MazeNode]:
+    def generate_maze(self) -> Maze:
         ...
 
 
 
 class SolvingAlgorithm(ABC):
-
-    @classmethod
+    def __init__(self, maze: Maze) -> None:
+        self.maze = maze
+    
     @abstractmethod
-    def solve_maze(cls, maze_body: List[MazeNode]) -> List[MazeNode]:
+    def solve_maze(self) -> List[MazeNode]:
         ...
 
 
@@ -69,10 +77,10 @@ class Maze():
         
         return output
     
-    @staticmethod
-    def get_generated_maze(maze_body: List[MazeNode],
-     generation_algorithm: GenerationAlgorithm) -> List[MazeNode]:
-        return generation_algorithm.generate_maze(maze_body)
+    @classmethod
+    def get_generated_maze(cls, maze: Maze,
+     generation_algorithm: GenerationAlgorithm) -> Maze:
+        return generation_algorithm.generate_maze(maze)
     
     def get_node_neighbours(self, x, y) -> List[MazeNode]:
         output = [self.get_node_neighbour_above(x, y), self.get_node_neighbour_below(x, y), 
@@ -93,6 +101,5 @@ class Maze():
             return self.maze_body[(y * self.w) + x - 1]
 
     def get_node_neighbour_right(self, x, y) -> Union[MazeNode, None]:
-        print(x - self.w + 1)
         if -1 < x < self.w - 1:
             return self.maze_body[(y * self.w) + x + 1]

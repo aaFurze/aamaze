@@ -10,6 +10,7 @@ TARGET_FPS = 60
 TARGET_MONITOR_NUM = 1
 
 WALL_COLOUR = [32, 160, 32]
+BACKGROUND_COLOUR = [4, 4, 4]
 
 pygame.init()
 
@@ -36,10 +37,10 @@ class GraphicsApp:
 
     def run(self):
         while self.running:
-            print(self._clock.tick(TARGET_FPS))
             DrawMaze.draw_maze(self.window, self.maze)
             self.event_loop()
             pygame.display.update()
+            self.window.fill(BACKGROUND_COLOUR)
 
     
     def event_loop(self):

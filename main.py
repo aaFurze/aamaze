@@ -1,12 +1,14 @@
 from src.base_maze import Maze
+from src.generation.recursive_backtracker import RecursiveBacktrackerAlgorithm
 from src.graphics.draw_maze import GraphicsApp
+from src.solving.flood_fill import FloodFillSolutionCheck
 
 
 def run():
-    test_maze = Maze(10, 4)
-    test_maze.get_node(3, 3).walls = 0b00000000
-    test_maze.get_node(3, 2).walls = 0b00000000
-    test_maze.get_node(2, 2).walls = 0b00000000
+    test_maze = Maze(16, 16)
+    RecursiveBacktrackerAlgorithm(test_maze).generate_maze()
+    FloodFillSolutionCheck(test_maze).solve_maze()
+
     app = GraphicsApp(test_maze)
     app.run()
 
