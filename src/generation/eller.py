@@ -100,4 +100,3 @@ class MutableSet:
     def intersection(self, other_set: Union[MutableSet, set]) -> Union[MutableSet, set]:
         if type(other_set) is MutableSet: return MutableSet(self.value.intersection(other_set.value))
         if type(other_set) is set: return self.value.intersection(other_set)
-

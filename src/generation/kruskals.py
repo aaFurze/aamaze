@@ -9,37 +9,56 @@ class KruskalsGenerationAlgorithm(GenerationAlgorithm):
         super().__init__(maze)
 
         self.walls: Set[str]  = self.get_all_walls(maze)
-        self.node_index_sets: List[Set[int]] = self.get_individual_node_sets(maze)
+        self.node_index_set_dict: Dict[int, int] = self.get_start_node_index_set_dict(maze)
+        self.set_dict: Dict[int: set] = {}
+
     
-    """TODO: Fix bug where rightmost nodes and topmost nodes always have no walls."""
     def generate_maze(self) -> Maze:
 
         while len(self.walls) > 0:
-
             current_wall = self.walls.pop()
 
             seperator_index = current_wall.find(",")
             node1_index = int(current_wall[:seperator_index])
             node2_index = int(current_wall[seperator_index + 1:])
 
-            if node1_index not in self.node_index_sets[node1_index]:
-                continue
+            node1_set_index = self.node_index_set_dict[node1_index]
+            node2_set_index = self.node_index_set_dict[node2_index]
 
-            intersection = {node1_index}.intersection(self.node_index_sets[node2_index])
+            if node1_set_index == node2_set_index and node1_set_index != -1: continue
 
-            if len({node1_index}.intersection(self.node_index_sets[node2_index])) == 0:
-                self.node_index_sets[node2_index] = self.node_index_sets[node2_index].union(self.node_index_sets[node1_index])
-                self.node_index_sets[node1_index] = set()
-                self.remove_walls(self.maze.maze_body[node1_index], self.maze.maze_body[node2_index])
+            if node1_set_index == -1 and node2_set_index == -1:
+                new_set_index = len(self.set_dict.keys())
+                self.set_dict[new_set_index] = {node1_index, node2_index}
+                self.node_index_set_dict[node1_index] = new_set_index
+                self.node_index_set_dict[node2_index] = new_set_index
+
+            elif node1_set_index == -1:
+                self.set_dict[node2_set_index].add(node1_index)
+                self.node_index_set_dict[node1_index] = node2_set_index
+
+            elif node2_set_index == -1:
+                self.set_dict[node1_set_index].add(node2_index) 
+                self.node_index_set_dict[node2_index] = node1_set_index
+
+            else:
+                self.set_dict[node1_set_index] = self.set_dict[node1_set_index].union(self.set_dict[node2_set_index])
+                self.set_dict[node2_set_index] = None
+                for key in self.node_index_set_dict.keys():
+                    if self.node_index_set_dict[key] == node2_set_index: self.node_index_set_dict[key] = node1_set_index
+                self.node_index_set_dict[node2_index] = node1_set_index
+            
+            self.remove_walls(self.maze.maze_body[node1_index], self.maze.maze_body[node2_index])
         
-        print("Finished Maze Generation")
-
         return self.maze
+
+
+    def get_start_node_index_set_dict(self, maze: Maze) -> Dict[int, int]:
+        return {node_index: -1 for node_index in range(len(maze.maze_body))}
 
 
     def get_all_walls(self, maze: Maze) -> Set[MazeNode]:
         maze_body = maze.maze_body
-
         walls = set()
         for node in maze_body:
             if node.walls & TOP_WALL and node.y > 0:
@@ -48,15 +67,6 @@ class KruskalsGenerationAlgorithm(GenerationAlgorithm):
                 walls.add(self.create_wall_string(node.x, node.y, node.x - 1, node.y, maze.w))
             
         return walls
-    
-    def get_individual_node_sets(self, maze: Maze) -> List[Set[str]]:
-        node_sets = []
-        for node in maze.maze_body:
-            node_sets.append({node.x + (node.y * maze.w)})
-        return node_sets
-    
-    def create_node_string(self, node: MazeNode):
-        return f"{node.x} {node.y}"
 
     @staticmethod
     def create_wall_string(n1x: int, n1y: int, n2x: int, n2y: int, maze_width: int) -> str:
