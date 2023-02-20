@@ -42,31 +42,3 @@ class RecursiveBacktrackerAlgorithm(GenerationAlgorithm):
                 break
 
         return self.maze
-
-
-    @staticmethod
-    def remove_walls(current_node: MazeNode, neighbour_node: MazeNode):
-        if neighbour_node.x > current_node.x:
-            neighbour_node.walls &= 0b00001101
-            current_node.walls &= 0b00001110
-            return
-        
-        if neighbour_node.x < current_node.x:
-            neighbour_node.walls &= 0b00001110
-            current_node.walls &= 0b00001101
-            return
-        
-        if neighbour_node.y > current_node.y:
-            neighbour_node.walls &= 0b00001011
-            current_node.walls &= 0b00000111
-            return
-
-        neighbour_node.walls &= 0b00000111
-        current_node.walls &= 0b00001011
-        return
-
-
-
-
-
-

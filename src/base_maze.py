@@ -40,6 +40,49 @@ class GenerationAlgorithm(ABC):
     def generate_maze(self) -> Maze:
         ...
 
+    @staticmethod
+    def remove_walls(current_node: MazeNode, neighbour_node: MazeNode):
+        if neighbour_node.x > current_node.x:
+            neighbour_node.walls &= 0b00001101
+            current_node.walls &= 0b00001110
+            return
+        
+        if neighbour_node.x < current_node.x:
+            neighbour_node.walls &= 0b00001110
+            current_node.walls &= 0b00001101
+            return
+        
+        if neighbour_node.y > current_node.y:
+            neighbour_node.walls &= 0b00001011
+            current_node.walls &= 0b00000111
+            return
+        if neighbour_node.y < current_node.y:
+            neighbour_node.walls &= 0b00000111
+            current_node.walls &= 0b00001011
+            return
+
+
+    @staticmethod
+    def add_walls(current_node: MazeNode, neighbour_node: MazeNode):
+        if neighbour_node.x > current_node.x:
+            neighbour_node.walls |= 0b00000010
+            current_node.walls |= 0b00000001
+            return
+        
+        if neighbour_node.x < current_node.x:
+            neighbour_node.walls |= 0b00000001
+            current_node.walls |= 0b00000010
+            return
+        
+        if neighbour_node.y > current_node.y:
+            neighbour_node.walls |= 0b00001011
+            current_node.walls |= 0b00000111
+            return
+        if neighbour_node.y < current_node.y:
+            neighbour_node.walls |= 0b00001000
+            current_node.walls |= 0b00000100
+            return
+
 
 
 class SolvingAlgorithm(ABC):
