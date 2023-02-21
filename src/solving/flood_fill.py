@@ -10,6 +10,9 @@ class FloodFillSolutionCheck(SolvingAlgorithm):
 
         self.visited_nodes: Set[MazeNode] = set()
         self.unchecked_nodes: List[MazeNode] = []
+
+        self.fill_percent: float = 0  # Value between 0 and 1 depending on how many nodes were visited in the maze.
+        self.fully_filled: bool = False  # True if all nodes in the maze were visited else False
     
     def solve_maze(self) -> List[MazeNode]:
         self.unchecked_nodes.append(self.maze.get_node(0, 0))
@@ -25,6 +28,9 @@ class FloodFillSolutionCheck(SolvingAlgorithm):
 
                 self.visited_nodes.add(neighbour_node)
                 self.unchecked_nodes.append(neighbour_node)
+        
+        self.fill_percent = len(self.visited_nodes) / len(self.maze.maze_body)
+        if len(self.visited_nodes) == len(self.maze.maze_body): self.fully_filled = True
 
         return list(self.visited_nodes)
 

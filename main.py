@@ -9,11 +9,15 @@ from src.solving.flood_fill import FloodFillSolutionCheck
 
 def run():
     test_maze = Maze(32, 32)
-    # EllersGenerationAlgorithm(test_maze).generate_maze()
+    EllersGenerationAlgorithm(test_maze).generate_maze()
     # KruskalsGenerationAlgorithm(test_maze).generate_maze()
-    PrimsGenerationAlgorithm(test_maze).generate_maze()
+    # PrimsGenerationAlgorithm(test_maze).generate_maze()
     # RecursiveBacktrackerAlgorithm(test_maze).generate_maze()
-    # print(len(FloodFillSolutionCheck(test_maze).solve_maze()))
+    flood_fill_check = FloodFillSolutionCheck(test_maze)
+    flood_fill_check.solve_maze()
+
+    print(flood_fill_check.fill_percent)
+    print(flood_fill_check.fully_filled)
 
 
 
