@@ -59,16 +59,25 @@ class DrawMaze:
          window.get_height())
 
         wall_width = cls._get_wall_width(tile_size)
+
+        maze_draw_offset = [cls.get_draw_offset_1D(window.get_width(), maze.w, tile_size, wall_width),
+                            -cls.get_draw_offset_1D(window.get_height(), maze.h, tile_size, wall_width)]
+
         
+        draw_surface = pygame.Surface([window.get_width() - maze_draw_offset[0] + 1, window.get_height()])
+
+
         for node in maze.maze_body:
             if node.walls & TOP_WALL: 
-                cls.draw_top_wall(window, node.x, node.y, wall_width, tile_size)
+                cls.draw_top_wall(draw_surface, node.x, node.y, wall_width, tile_size)
             if node.walls & BOTTOM_WALL : 
-                cls.draw_bottom_wall(window, node.x, node.y, wall_width, tile_size)
+                cls.draw_bottom_wall(draw_surface, node.x, node.y, wall_width, tile_size)
             if node.walls & LEFT_WALL: 
-                cls.draw_left_wall(window, node.x, node.y, wall_width, tile_size)
+                cls.draw_left_wall(draw_surface, node.x, node.y, wall_width, tile_size)
             if node.walls & RIGHT_WALL: 
-                cls.draw_right_wall(window, node.x, node.y, wall_width, tile_size)    
+                cls.draw_right_wall(draw_surface, node.x, node.y, wall_width, tile_size)   
+        
+        window.blit(draw_surface, maze_draw_offset) 
 
 
     @staticmethod
@@ -115,3 +124,7 @@ class DrawMaze:
     @staticmethod
     def _get_wall_width(tile_size: int) -> int:
         return max(2, (tile_size // 16) * 2)
+
+    @staticmethod
+    def get_draw_offset_1D(window_dimension_size: int, maze_dimension_size: int, tile_size: int, wall_width: int) -> int:
+        return (window_dimension_size - (maze_dimension_size * tile_size) - wall_width) // 2

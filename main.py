@@ -7,11 +7,11 @@ from src.solving.flood_fill import FloodFillSolutionCheck
 
 
 def run():
-    test_maze = Maze(16, 16)
+    test_maze = Maze(64, 36)
     # EllersGenerationAlgorithm(test_maze).generate_maze()
     KruskalsGenerationAlgorithm(test_maze).generate_maze()
     # RecursiveBacktrackerAlgorithm(test_maze).generate_maze()
-    FloodFillSolutionCheck(test_maze).solve_maze()
+    # print(len(FloodFillSolutionCheck(test_maze).solve_maze()))
 
 
 
