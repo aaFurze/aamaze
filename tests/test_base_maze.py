@@ -45,32 +45,32 @@ class TestMaze:
      (4, 4, 3), (4, 5, 2)])
     def test_get_node_neighbours_count(self, mock_maze: Maze, x: int, y: int,
      expected_count: int):
-        assert len(mock_maze.get_node_neighbours(x, y)) == expected_count
+        assert len(mock_maze.get_neighbours_from_coordinates(x, y)) == expected_count
 
     @pytest.mark.parametrize("neighbour_index, expected_x, expected_y", [(0, 2, 4), (1, 2, 2),
      (2, 1, 3), (3, 3, 3)])
     def test_get_node_neighbours_first_node_coordinates(self, mock_maze: Maze,
      neighbour_index, expected_x: int, expected_y: int):
-        neighbours = mock_maze.get_node_neighbours(2, 3)
+        neighbours = mock_maze.get_neighbours_from_coordinates(2, 3)
         assert neighbours[neighbour_index].x == expected_x
         assert neighbours[neighbour_index].y == expected_y
 
     @pytest.mark.parametrize("neighbour_index, expected_x, expected_y", [(0, 0, 4), (1, 1, 5)])
     def test_get_node_neighbours_first_node_coordinates_corner(self, mock_maze: Maze,
      neighbour_index, expected_x: int, expected_y: int):
-        neighbours = mock_maze.get_node_neighbours(0, 5)
+        neighbours = mock_maze.get_neighbours_from_coordinates(0, 5)
         assert neighbours[neighbour_index].x == expected_x
         assert neighbours[neighbour_index].y == expected_y
 
     @pytest.mark.parametrize("x, y", [(0, 1), (1, 2), (3, 4), (4, 5), (3, 3)])
     def test_get_node_valid_input(self, mock_maze: Maze, x, y):
-        node = mock_maze.get_node(x, y)
+        node = mock_maze.get_node_from_coordinates(x, y)
         assert node.x == x
         assert node.y == y
 
     @pytest.mark.parametrize("x, y", [(-1, 1), (100, 200), (3, 400), (40, 5), (-456546, -5)])
     def test_get_node_invalid_input(self, mock_maze: Maze, x, y):
-        node = mock_maze.get_node(x, y)
+        node = mock_maze.get_node_from_coordinates(x, y)
         assert node is None
 
 

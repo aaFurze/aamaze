@@ -87,7 +87,7 @@ class GenerationAlgorithm(ABC):
 
 class SolvingAlgorithm(ABC):
     def __init__(self, maze: Maze) -> None:
-        self.maze = maze
+        self.maze: Maze = maze
     
     @abstractmethod
     def solve_maze(self) -> List[MazeNode]:
@@ -105,11 +105,14 @@ class Maze():
         self.maze_body: List[MazeNode] = self.generate_blank_maze(self.w, self.h)
 
     
-    def get_node(self, x: int, y: int) -> Union[MazeNode, None]:
+    def get_node_from_coordinates(self, x: int, y: int) -> Union[MazeNode, None]:
         if x < 0 or x >= self.w: return None
         if y < 0 or y >= self.h: return None
 
         return self.maze_body[(y * self.w) + x]
+
+    def get_node_index(self, node: MazeNode):
+        return node.x + (node.y * self.w)
 
 
     def generate_blank_maze(self, width: int, height: int) -> List[MazeNode]:
@@ -124,25 +127,36 @@ class Maze():
     def get_generated_maze(cls, maze: Maze,
      generation_algorithm: GenerationAlgorithm) -> Maze:
         return generation_algorithm.generate_maze(maze)
-    
-    def get_node_neighbours(self, x, y) -> List[MazeNode]:
-        output = [self.get_node_neighbour_above(x, y), self.get_node_neighbour_below(x, y), 
-        self.get_node_neighbour_left(x, y), self.get_node_neighbour_right(x, y)]
+        
+
+    def get_node_neighbours(self, node: MazeNode) -> List[MazeNode]:
+        return self.get_neighbours_from_coordinates(node.x, node.y)
+
+    def get_neighbours_from_coordinates(self, x, y) -> List[MazeNode]:
+        output = [self._get_node_neighbour_above(x, y), self._get_node_neighbour_below(x, y), 
+        self._get_node_neighbour_left(x, y), self._get_node_neighbour_right(x, y)]
 
         return [value for value in output if value is not None]
     
-    def get_node_neighbour_below(self, x, y) -> Union[MazeNode, None]:
+    def _get_node_neighbour_below(self, x, y) -> Union[MazeNode, None]:
         if self.h >= y > 0: 
             return self.maze_body[((y - 1) * self.w) + x]
     
-    def get_node_neighbour_above(self, x, y) -> Union[MazeNode, None]:
+    def _get_node_neighbour_above(self, x, y) -> Union[MazeNode, None]:
         if -1 < y < self.h - 1:
             return self.maze_body[((y + 1) * self.w) + x]
 
-    def get_node_neighbour_left(self, x, y) -> Union[MazeNode, None]:
+    def _get_node_neighbour_left(self, x, y) -> Union[MazeNode, None]:
         if self.w >= x > 0:
             return self.maze_body[(y * self.w) + x - 1]
 
-    def get_node_neighbour_right(self, x, y) -> Union[MazeNode, None]:
+    def _get_node_neighbour_right(self, x, y) -> Union[MazeNode, None]:
         if -1 < x < self.w - 1:
             return self.maze_body[(y * self.w) + x + 1]
+
+    def check_seperated_by_wall(self, node_1: MazeNode, node_2: MazeNode) -> bool:
+        if node_1.y == node_2.y - 1 and node_1.walls & TOP_WALL: return True
+        if node_1.y == node_2.y + 1 and node_1.walls & BOTTOM_WALL: return True
+        if node_1.x == node_2.x + 1 and node_1.walls & LEFT_WALL: return True
+        if node_1.x == node_2.x - 1 and node_1.walls & RIGHT_WALL: return True
+        return False

@@ -15,12 +15,12 @@ class FloodFillSolutionCheck(SolvingAlgorithm):
         self.fully_filled: bool = False  # True if all nodes in the maze were visited else False
     
     def solve_maze(self) -> List[MazeNode]:
-        self.unchecked_nodes.append(self.maze.get_node(0, 0))
+        self.unchecked_nodes.append(self.maze.get_node_from_coordinates(0, 0))
         self.visited_nodes.add(self.unchecked_nodes[0])
 
         while len(self.unchecked_nodes) > 0:
             current_node = self.unchecked_nodes.pop(0)
-            neighbours = self.maze.get_node_neighbours(current_node.x, current_node.y)
+            neighbours = self.maze.get_neighbours_from_coordinates(current_node.x, current_node.y)
 
             for neighbour_node in neighbours:
                 if {neighbour_node}.issubset(self.visited_nodes): continue

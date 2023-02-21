@@ -22,7 +22,7 @@ class PrimsGenerationAlgorithm(GenerationAlgorithm):
             self.visited_nodes.append(adjacent_node_indexes[random.randint(0, len(adjacent_node_indexes) - 1)])
             self.visit_status[self.visited_nodes[-1]] = True
 
-            new_node_neighbours = self.maze.get_node_neighbours(self.visited_nodes[-1] % self.maze.w,
+            new_node_neighbours = self.maze.get_neighbours_from_coordinates(self.visited_nodes[-1] % self.maze.w,
              self.visited_nodes[-1] // self.maze.w)
             random.shuffle(new_node_neighbours)
             
@@ -43,7 +43,7 @@ class PrimsGenerationAlgorithm(GenerationAlgorithm):
         output = []
 
         for node_index in self.visited_nodes:
-            neighbours = self.maze.get_node_neighbours(node_index % self.maze.w, node_index // self.maze.w)
+            neighbours = self.maze.get_neighbours_from_coordinates(node_index % self.maze.w, node_index // self.maze.w)
             for neighbour in neighbours:
                 if not self.visit_status[neighbour.x + (neighbour.y * self.maze.w)]: 
                     output.append(neighbour.x + (neighbour.y * self.maze.w))

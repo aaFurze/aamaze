@@ -14,13 +14,13 @@ class RecursiveBacktrackerAlgorithm(GenerationAlgorithm):
         if len(self.maze.maze_body) <= 1: return self.maze.maze_body
 
         # Pick a start Node
-        self.visited_nodes.append(self.maze.get_node(0, 0))
+        self.visited_nodes.append(self.maze.get_node_from_coordinates(0, 0))
         node_index = 0
 
         while len(self.visited_nodes) < len(self.maze.maze_body):
 
 
-            current_neighbour_nodes = self.maze.get_node_neighbours(self.visited_nodes[node_index].x,
+            current_neighbour_nodes = self.maze.get_neighbours_from_coordinates(self.visited_nodes[node_index].x,
              self.visited_nodes[node_index].y)
 
             while True:
