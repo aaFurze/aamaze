@@ -32,7 +32,8 @@ class FloodFillSolutionCheck(SolvingAlgorithm):
         self.fill_percent = len(self.visited_nodes) / len(self.maze.maze_body)
         if len(self.visited_nodes) == len(self.maze.maze_body): self.fully_filled = True
 
-        return list(self.visited_nodes)
+        self.solution = list(self.visited_nodes)
+        return self.solution
 
 
     @staticmethod

@@ -88,6 +88,7 @@ class GenerationAlgorithm(ABC):
 class SolvingAlgorithm(ABC):
     def __init__(self, maze: Maze) -> None:
         self.maze: Maze = maze
+        self.solution: List[MazeNode]
     
     @abstractmethod
     def solve_maze(self) -> List[MazeNode]:

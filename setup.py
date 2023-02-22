@@ -16,6 +16,7 @@ setup(
     install_requires=install_requires,
     package_dir={"": "aamaze"},
     packages=["", "generation", "graphics", "solving"],
+    python_requires='>=3.7',
     url="https://github.com/aaFurze/aamaze",
 
 )

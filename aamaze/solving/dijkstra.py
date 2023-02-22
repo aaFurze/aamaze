@@ -16,7 +16,7 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
         self.node_paths: List[List[MazeNode]] = self.generate_start_path_dict(len(self.maze.maze_body))
 
         self.solved = False
-        self.shortest_path: List[MazeNode] = []
+        self.solution: List[MazeNode] = []
     
     def solve_maze(self) -> List[MazeNode]:
         current_node_index = 0  # start node
@@ -41,7 +41,7 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
 
             if current_node_index == self.target_node_index:
                 self.node_paths[current_node_index] = self.node_paths[current_node_index] + [self.maze.maze_body[current_node_index]]
-                self.shortest_path = self.node_paths[current_node_index]
+                self.solution = self.node_paths[current_node_index]
                 self.solved = True
             
 
@@ -51,6 +51,8 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
 
             
             current_node_index = next_node_index
+        
+        return self.solution
 
 
     def get_nearest_node_index_and_distance(self):
