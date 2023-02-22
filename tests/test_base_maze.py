@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 
-from src.base_maze import GenerationAlgorithm, Maze, MazeNode
+from aamaze.base_maze import GenerationAlgorithm, Maze, MazeNode
 
 
 class MockGenerationAlgorithm(GenerationAlgorithm):
