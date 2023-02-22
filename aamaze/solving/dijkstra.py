@@ -8,52 +8,61 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
 
-        self.unvisited_nodes = [index for index in range(0, len(self.maze.maze_body))]
-        self.visit_statuses: Dict[int, bool] = self.generate_visit_statuses_dict(len(self.maze.maze_body))
+        self.target_node_index = self.maze.size - 1
+        self.current_node_index: int
 
-        self.target_node_index = len(self.maze.maze_body) - 1
-
-        self.node_paths: List[List[MazeNode]] = self.generate_start_path_dict(len(self.maze.maze_body))
-
-        self.solved = False
-        self.solution: List[MazeNode] = []
+        self.unvisited_nodes: List[int]
+        self.visit_statuses: Dict[int, bool]
+        self.node_paths: List[List[MazeNode]]
+        self.setup_data_structures()
     
+    def setup_data_structures(self):
+        self.unvisited_nodes = [index for index in range(0, self.maze.size)]
+        self.visit_statuses = {key: False for key in range(0, self.maze.size)}
+        self.node_paths = [[] for _ in range(0, self.maze.size)]
+        self.solution = []
+
     def solve_maze(self) -> List[MazeNode]:
-        current_node_index = 0  # start node
-        self.node_paths[current_node_index] = []
+        self.current_node_index = 0  # start node
+        self.node_paths[self.current_node_index] = []
 
-        while not self.solved:
-            neighbours = self.maze.get_node_neighbours(self.maze.maze_body[current_node_index])
-
-            for neighbour in neighbours:
-                if self.maze.check_seperated_by_wall(self.maze.maze_body[current_node_index], neighbour): continue
-
-                neighbour_index = self.maze.get_node_index(neighbour)
-                if self.visit_statuses[neighbour_index]: continue
-
-                new_distance = len(self.node_paths[current_node_index]) + 1
-                if new_distance < len(self.node_paths[neighbour_index]) or len(self.node_paths[neighbour_index]) == 0: 
-                    self.node_paths[neighbour_index] = self.node_paths[current_node_index] + [self.maze.maze_body[current_node_index]]
-            
-            self.visit_statuses[current_node_index] = True
-            self.unvisited_nodes.remove(current_node_index)
-
-
-            if current_node_index == self.target_node_index:
-                self.node_paths[current_node_index] = self.node_paths[current_node_index] + [self.maze.maze_body[current_node_index]]
-                self.solution = self.node_paths[current_node_index]
-                self.solved = True
-            
-
-            next_node_index = self.get_nearest_node_index_and_distance()
-
-            if next_node_index == -1: break
-
-            
-            current_node_index = next_node_index
+        while self.current_node_index >= 0 and self.current_node_index != self.target_node_index:
+            self.current_node_index = self.step()
         
+        self._set_solved()
         return self.solution
 
+
+    def step(self):
+        if self.current_node_index <= -1: return -1
+        if self.current_node_index == self.target_node_index:
+            return self.current_node_index
+
+        current_node = self.maze[self.current_node_index]
+        current_node_neighbours = self.maze.get_node_neighbours(current_node)
+
+        for neighbour in current_node_neighbours:
+            if self.maze.check_nodes_seperated_by_wall(current_node, neighbour): continue
+
+            neighbour_index = self.maze.get_node_index(neighbour)
+            if self.visit_statuses[neighbour_index]: continue
+
+            new_distance = len(self.node_paths[self.current_node_index]) + 1
+            if new_distance < len(self.node_paths[neighbour_index]) or len(self.node_paths[neighbour_index]) == 0: 
+                self.node_paths[neighbour_index] = self.node_paths[self.current_node_index] + [self.maze[self.current_node_index]]
+        
+        self.visit_statuses[self.current_node_index] = True
+        self.unvisited_nodes.remove(self.current_node_index)
+
+        return self.get_nearest_node_index_and_distance()
+
+
+    def _set_solved(self) -> bool:
+        self.node_paths[self.current_node_index] = self.node_paths[self.current_node_index] + [self.maze[self.current_node_index]]
+        self.solution = self.node_paths[self.current_node_index]
+        if self.current_node_index == self.target_node_index: self.solved = True
+        else: self.solved = False
+        return self.solved
 
     def get_nearest_node_index_and_distance(self):
         shortest_distance = 9999999
@@ -64,12 +73,3 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
                 shortest_distance = len(self.node_paths[node_index])
         
         return nearest_index
-
-
-    @staticmethod
-    def generate_start_path_dict(num_nodes: int) -> Dict[int, int]:
-        return [[] for _ in range(0, num_nodes)]
-    
-    @staticmethod
-    def generate_visit_statuses_dict(num_nodes: int) -> Dict[int, bool]:
-        return {key: False for key in range(0, num_nodes)}

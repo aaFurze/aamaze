@@ -20,13 +20,13 @@ class EllersGenerationAlgorithm(GenerationAlgorithm):
 
         current_row_node_sets: List[MutableSet[int]] = []
 
-        while y + 1 < len(self.maze.maze_body):
+        while y + 1 < self.maze.size:
             current_row_node_sets = []
             # increment by 1
             x = 0
             # Create individual sets for first row.
             while x < self.maze.w:
-                current_row_node_sets.append(MutableSet(self.maze.maze_body[x + y].x + (self.maze.maze_body[x + y].y * self.maze.w)))
+                current_row_node_sets.append(MutableSet(self.maze[x + y].x + (self.maze[x + y].y * self.maze.w)))
                 x += 1
             
             # For each set (barring first)
@@ -36,15 +36,15 @@ class EllersGenerationAlgorithm(GenerationAlgorithm):
                     # If == 1: Merge sets and remove walls between nodes.
                     if random.randint(0, 2):
                         current_row_node_sets[x] = current_row_node_sets[x - 1].union(current_row_node_sets[x])     
-                        self.remove_walls(self.maze.maze_body[x + y], self.maze.maze_body[y + x - 1])  
+                        self.remove_walls(self.maze[x + y], self.maze[y + x - 1])  
             
 
             sets_checked_ids = []
 
-            if y + self.maze.w >= len(self.maze.maze_body):
-                for i in range(len(self.maze.maze_body) - self.maze.w, len(self.maze.maze_body) - 1):
-                    self.remove_walls(self.maze.maze_body[i], self.maze.maze_body[i - 1])
-                    self.remove_walls(self.maze.maze_body[i], self.maze.maze_body[i + 1])
+            if y + self.maze.w >= self.maze.size:
+                for i in range(self.maze.size - self.maze.w, self.maze.size - 1):
+                    self.remove_walls(self.maze[i], self.maze[i - 1])
+                    self.remove_walls(self.maze[i], self.maze[i + 1])
 
                 
                 break
@@ -60,7 +60,7 @@ class EllersGenerationAlgorithm(GenerationAlgorithm):
                 # Pick a random node in the set.
                 random_node_id = list(c_node_set)[random.randint(0, len(c_node_set) - 1)]
                 above_node_id = random_node_id + self.maze.w
-                self.remove_walls(self.maze.maze_body[random_node_id], self.maze.maze_body[above_node_id])
+                self.remove_walls(self.maze[random_node_id], self.maze[above_node_id])
     
             y += self.maze.w 
 

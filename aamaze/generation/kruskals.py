@@ -48,7 +48,7 @@ class KruskalsGenerationAlgorithm(GenerationAlgorithm):
                     if self.node_index_set_dict[key] == node2_set_index: self.node_index_set_dict[key] = node1_set_index
                 self.node_index_set_dict[node2_index] = node1_set_index
             
-            self.remove_walls(self.maze.maze_body[node1_index], self.maze.maze_body[node2_index])
+            self.remove_walls(self.maze[node1_index], self.maze[node2_index])
         
         return self.maze
 
