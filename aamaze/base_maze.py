@@ -86,6 +86,8 @@ class SolvingAlgorithm(ABC):
         self.maze: Maze = maze
         self.solved: bool = False
         self.solution: List[MazeNode]
+
+        self.step_counter: int = 0
     
     @abstractmethod
     def setup_data_structures(self):

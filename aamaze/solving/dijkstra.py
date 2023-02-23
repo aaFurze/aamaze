@@ -15,14 +15,17 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
         self.visit_statuses: Dict[int, bool]
         self.node_paths: List[List[MazeNode]]
         self.setup_data_structures()
+
     
     def setup_data_structures(self):
         self.unvisited_nodes = [index for index in range(0, self.maze.size)]
         self.visit_statuses = {key: False for key in range(0, self.maze.size)}
         self.node_paths = [[] for _ in range(0, self.maze.size)]
         self.solution = []
+        self.step_counter = 0
 
     def solve_maze(self) -> List[MazeNode]:
+        self.step_counter += 1
         self.current_node_index = 0  # start node
         self.node_paths[self.current_node_index] = []
 
@@ -34,6 +37,7 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
 
 
     def step(self):
+        self.step_counter += 1
         if self.current_node_index <= -1: return -1
         if self.current_node_index == self.target_node_index:
             return self.current_node_index
@@ -54,7 +58,7 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
         self.visit_statuses[self.current_node_index] = True
         self.unvisited_nodes.remove(self.current_node_index)
 
-        return self.get_nearest_node_index_and_distance()
+        return self.get_nearest_node_index()
 
 
     def _set_solved(self) -> bool:
@@ -64,7 +68,7 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
         else: self.solved = False
         return self.solved
 
-    def get_nearest_node_index_and_distance(self):
+    def get_nearest_node_index(self):
         shortest_distance = 9999999
         nearest_index = -1
         for node_index in self.unvisited_nodes:

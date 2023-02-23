@@ -14,7 +14,7 @@ class KruskalsGenerationAlgorithm(GenerationAlgorithm):
 
     
     def generate_maze(self) -> Maze:
-
+        
         while len(self.walls) > 0:
             current_wall = self.walls.pop()
 

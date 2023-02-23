@@ -20,6 +20,7 @@ class FloodFillSolutionCheck(SolvingAlgorithm):
         self.visited_nodes = set()
         self.unchecked_nodes = []
         self.solution = []
+        self.step_counter = 0
 
     def solve_maze(self) -> List[MazeNode]:
         self.unchecked_nodes.append(self.maze.get_node_from_coordinates(0, 0))
@@ -32,6 +33,7 @@ class FloodFillSolutionCheck(SolvingAlgorithm):
         return self.solution
 
     def step(self):
+        self.step_counter += 1
         current_node = self.unchecked_nodes.pop(0)
         neighbours = self.maze.get_neighbours_from_coordinates(current_node.x, current_node.y)
 
