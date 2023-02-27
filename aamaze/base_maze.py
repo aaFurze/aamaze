@@ -105,7 +105,11 @@ class SolvingAlgorithm(ABC):
     def _set_solved(self) -> bool:
         ...
 
-
+    
+    @abstractmethod
+    def get_incomplete_solution_nodes(self) -> List[MazeNode]:
+        ...
+    
 
 class Maze():
 

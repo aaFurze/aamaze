@@ -11,13 +11,14 @@ class AStarSolvingAlgorithm(SolvingAlgorithm):
 
         self.path_nodes: List[PathNode]
         self.open_nodes: List[PathNode]
-        self.closed_nodes: List[MazeNode]
+        self.closed_nodes: List[PathNode]
 
         self.current_node: PathNode
         self.target_node_index = self.maze.size - 1
         self.target_node: PathNode
 
         self.setup_data_structures()
+
     
     def setup_data_structures(self):
         self.path_nodes = self.get_open_nodes_list()
@@ -33,42 +34,53 @@ class AStarSolvingAlgorithm(SolvingAlgorithm):
 
         self.target_node = self.path_nodes[self.target_node_index]
 
+    def solve_maze(self) -> List[MazeNode]:
+        while not self.solved and len(self.open_nodes) > 0:
+            self.step()
+
+        return self.solution
+
     def step(self):
+        if self.solved: return
         self.step_counter += 1
+        
         self.current_node = self.get_lowest_f_value_node()
+
+        if self.current_node is None:
+            self._set_solved()
+            return
+
         self.open_nodes.remove(self.current_node)
         self.closed_nodes.append(self.current_node)
-
-        if self.current_node is None: return []
 
         if self.maze.get_node_index(self.current_node.node) == self.target_node_index:
             self._set_solved()
             return
     
-        open_neighbours = [self.get_path_node(maze_node) for maze_node in self.maze.get_node_neighbours(self.current_node.node)]
+        neighbours = [self.get_path_node(maze_node) for maze_node in self.maze.get_node_neighbours(self.current_node.node)]
 
-        for neighbour in open_neighbours:
-            if neighbour in self.closed_nodes: continue
+        for neighbour in neighbours:
+            if neighbour.f_value <= self.current_node.f_value: continue
             if self.maze.check_nodes_seperated_by_wall(self.current_node.node, neighbour.node): continue
-
-            if self.current_node.f_value >= neighbour.f_value: continue
+            if neighbour in self.closed_nodes: continue
 
             neighbour.g_value = self.calculate_g_value(self.current_node)
             neighbour.previous_node = self.current_node
 
             if neighbour not in self.closed_nodes: self.open_nodes.append(neighbour)
+  
+    def get_incomplete_solution_nodes(self) -> List[MazeNode]:
+        return [path_node.node for path_node in self.closed_nodes]
 
-
-    def solve_maze(self) -> List[MazeNode]:
-
-        while self.current_node != self.target_node:
-            self.step()
-
-        return self.solution
-            
 
     def _set_solved(self) -> bool:
-        self.solved = True
+        if self.current_node is None:
+            self.solved = False
+            return []
+
+        if self.maze.get_node_index(self.current_node.node) == self.target_node_index:
+            self.solved = True
+
         solution_node = self.target_node
         while solution_node is not None:
             self.solution.append(solution_node.node)
@@ -76,6 +88,7 @@ class AStarSolvingAlgorithm(SolvingAlgorithm):
         
 
         self.solution.reverse()
+        return self.solved
         
 
     def get_path_node(self, maze_node: MazeNode) -> PathNode:
@@ -87,7 +100,7 @@ class AStarSolvingAlgorithm(SolvingAlgorithm):
     
     def get_lowest_f_value_node(self) -> PathNode:
         l_value = 99999999
-        l_node: PathNode
+        l_node: PathNode = None
         for path_node in self.open_nodes:
             if path_node.f_value < l_value:
                 l_value = path_node.f_value
@@ -117,4 +130,4 @@ class PathNode:
         return self.g_value + self.h_value
     
     def __repr__(self) -> str:
-        return f"PathNode(node={self.node}, previous_node={self.previous_node}, g_value={self.g_value}, h_value={self.h_value})"
+        return f"PathNode(node={self.node}, previous_node={self.previous_node}, f_value={self.f_value}, g_value={self.g_value}, h_value={self.h_value})"

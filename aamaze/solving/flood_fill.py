@@ -22,18 +22,22 @@ class FloodFillSolutionCheck(SolvingAlgorithm):
         self.solution = []
         self.step_counter = 0
 
-    def solve_maze(self) -> List[MazeNode]:
         self.unchecked_nodes.append(self.maze.get_node_from_coordinates(0, 0))
         self.visited_nodes.add(self.unchecked_nodes[0])
 
-        while len(self.unchecked_nodes) > 0:
+
+    def solve_maze(self) -> List[MazeNode]:
+        while len(self.unchecked_nodes) > 0 and not self.solved:
             self.step()
 
-        self._set_solved()
         return self.solution
 
     def step(self):
+        if self.solved: return
+        if len(self.unchecked_nodes) == 0: return
         self.step_counter += 1
+
+        
         current_node = self.unchecked_nodes.pop(0)
         neighbours = self.maze.get_neighbours_from_coordinates(current_node.x, current_node.y)
 
@@ -44,6 +48,10 @@ class FloodFillSolutionCheck(SolvingAlgorithm):
             self.visited_nodes.add(neighbour_node)
             self.unchecked_nodes.append(neighbour_node)
 
+        if len(self.unchecked_nodes) == 0: 
+            self._set_solved()
+            return
+
     def _set_solved(self) -> bool:
         self.fill_percent = len(self.visited_nodes) / self.maze.size
         if len(self.visited_nodes) == self.maze.size: self.solved = True
@@ -52,3 +60,6 @@ class FloodFillSolutionCheck(SolvingAlgorithm):
         self.solution = list(self.visited_nodes)
 
         return self.solved
+
+    def get_incomplete_solution_nodes(self) -> List[MazeNode]:
+        return list(self.visited_nodes)

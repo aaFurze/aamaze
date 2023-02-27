@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, Union
 
 import pygame
@@ -11,8 +13,8 @@ TARGET_FPS = 60
 TARGET_MONITOR_NUM = 1
 
 WALL_COLOUR = [32, 160, 32]
-SOLUTION_TILE_COLOUR = [32, 32, 160]
-BACKGROUND_COLOUR = [4, 4, 4]
+SOLUTION_TILE_COLOUR = [32, 32, 240]
+BACKGROUND_COLOUR = [240, 250, 250]
 
 pygame.init()
 
@@ -39,9 +41,23 @@ class GraphicsApp:
              int(width / TARGET_ASPECT_RATIO[0] * TARGET_ASPECT_RATIO[1])]
 
     def run(self):
+        draw_properties = DrawProperties()
+        draw_properties.configure_properties(self.window, self.maze)
+
         while self.running:
-            if self.maze_solver: DrawMaze.draw_maze(self.window, self.maze, self.maze_solver.solution)
-            else: DrawMaze.draw_maze(self.window, self.maze, None)
+            draw_properties.surface.fill(BACKGROUND_COLOUR)
+
+            DrawMaze.draw_maze(self.maze, draw_properties)
+
+            if self.maze_solver: 
+                if self.maze_solver.solved:
+                    DrawMaze.draw_maze_solution(self.maze_solver.solution, draw_properties)
+                else:
+                    self.maze_solver.step()
+                    DrawMaze.draw_maze_solution(self.maze_solver.get_incomplete_solution_nodes(), draw_properties)
+            
+            self.window.blit(draw_properties.surface, draw_properties.surface_offset) 
+
 
             self.event_loop()
             pygame.display.update()
@@ -57,49 +73,27 @@ class GraphicsApp:
 
 
 class DrawMaze:
-    
     @classmethod
-    def draw_maze_solution(cls, surface: pygame.surface.Surface, maze: Maze, solution: List[MazeNode]):
-        tile_size = cls._get_tile_size(maze.w, maze.h, surface.get_width(),
-         surface.get_height())
+    def draw_maze_solution(cls, solution: List[MazeNode], draw_properties: DrawProperties):
 
-        wall_width = cls._get_wall_width(tile_size)
-
-        solution_circle_size = max((tile_size - wall_width) // 3, 1)
-
+        solution_circle_size = max((draw_properties.tile_size - draw_properties.wall_width) // 3, 1)
         for node in solution:
-            position = [node.x * tile_size + ((tile_size + wall_width) // 2), surface.get_height() - ((node.y + 1) * tile_size) + ((tile_size - wall_width) // 2)]
-            pygame.draw.circle(surface, SOLUTION_TILE_COLOUR, position, solution_circle_size)
+            position = [node.x * draw_properties.tile_size + ((draw_properties.tile_size + draw_properties.wall_width) // 2),
+             draw_properties.surface.get_height() - ((node.y + 1) * draw_properties.tile_size) + ((draw_properties.tile_size - draw_properties.wall_width) // 2)]
+            pygame.draw.circle(draw_properties.surface, SOLUTION_TILE_COLOUR, position, solution_circle_size)
 
     @classmethod
-    def draw_maze(cls, window: pygame.surface.Surface, maze: Maze, solution: Union[None, List[MazeNode]]):
-        tile_size = cls._get_tile_size(maze.w, maze.h, window.get_width(),
-         window.get_height())
-
-        wall_width = cls._get_wall_width(tile_size)
-
-        maze_draw_offset = [cls.get_draw_offset_1D(window.get_width(), maze.w, tile_size, wall_width),
-                            -cls.get_draw_offset_1D(window.get_height(), maze.h, tile_size, wall_width)]
-
-        
-        draw_surface = pygame.Surface([window.get_width() - maze_draw_offset[0] + 1, window.get_height()])
-
+    def draw_maze(cls, maze: Maze, draw_properties: DrawProperties):
 
         for node in maze.maze_body:
             if node.walls & TOP_WALL: 
-                cls.draw_top_wall(draw_surface, node.x, node.y, wall_width, tile_size)
+                cls.draw_top_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)
             if node.walls & BOTTOM_WALL : 
-                cls.draw_bottom_wall(draw_surface, node.x, node.y, wall_width, tile_size)
+                cls.draw_bottom_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)
             if node.walls & LEFT_WALL: 
-                cls.draw_left_wall(draw_surface, node.x, node.y, wall_width, tile_size)
+                cls.draw_left_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)
             if node.walls & RIGHT_WALL: 
-                cls.draw_right_wall(draw_surface, node.x, node.y, wall_width, tile_size)   
-        
-        if solution:
-            cls.draw_maze_solution(draw_surface, maze, solution)
-
-
-        window.blit(draw_surface, maze_draw_offset) 
+                cls.draw_right_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)   
 
 
 
@@ -136,9 +130,29 @@ class DrawMaze:
         pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
 
 
+
+class DrawProperties:
+    def __init__(self) -> None:
+        self.tile_size: int
+        self.wall_width: int
+        self.surface_offset: List[int]
+        self.surface: pygame.surface.Surface
+
+    def configure_properties(self, window: pygame.surface.Surface, maze: Maze):
+        self.tile_size = self._get_tile_size(maze.w, maze.h, window.get_width(),
+         window.get_height())
+
+        self.wall_width = self._get_wall_width(self.tile_size)
+
+        self.surface_offset = [self.get_draw_offset_1D(window.get_width(), maze.w, self.tile_size, self.wall_width),
+                            -self.get_draw_offset_1D(window.get_height(), maze.h, self.tile_size, self.wall_width)]
+
+        
+        self.surface = pygame.Surface([window.get_width() - self.surface_offset[0] + 1, window.get_height()])
+
+
     @staticmethod
-    def _get_tile_size(maze_width: int, maze_height: int,
-     window_width: int, window_height: int) -> int:
+    def _get_tile_size(maze_width: int, maze_height: int, window_width: int, window_height: int) -> int:
         enforced_padding = max(4, 32 - min(2 * maze_width, 2 * maze_height))
         
         return max(6, (int(min((window_width - enforced_padding) / maze_width,

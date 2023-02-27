@@ -23,24 +23,23 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
         self.node_paths = [[] for _ in range(0, self.maze.size)]
         self.solution = []
         self.step_counter = 0
+        self.current_node_index = 0  # start node
 
     def solve_maze(self) -> List[MazeNode]:
-        self.step_counter += 1
-        self.current_node_index = 0  # start node
-        self.node_paths[self.current_node_index] = []
 
-        while self.current_node_index >= 0 and self.current_node_index != self.target_node_index:
-            self.current_node_index = self.step()
+        while self.current_node_index >= 0 and not self.solved:
+            self.step()
         
-        self._set_solved()
         return self.solution
 
 
     def step(self):
+        if self.solved: return
         self.step_counter += 1
-        if self.current_node_index <= -1: return -1
-        if self.current_node_index == self.target_node_index:
-            return self.current_node_index
+         
+        if self.current_node_index <= -1 or self.current_node_index == self.target_node_index: 
+            self._set_solved()
+            return
 
         current_node = self.maze[self.current_node_index]
         current_node_neighbours = self.maze.get_node_neighbours(current_node)
@@ -58,15 +57,24 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
         self.visit_statuses[self.current_node_index] = True
         self.unvisited_nodes.remove(self.current_node_index)
 
-        return self.get_nearest_node_index()
+        self.current_node_index = self.get_nearest_node_index()
 
 
     def _set_solved(self) -> bool:
+        if self.current_node_index != self.target_node_index:
+            self.visit_statuses[self.current_node_index] = False
+            self.solved = False
+            return self.solved
+
+        self.visit_statuses[self.current_node_index] = True
         self.node_paths[self.current_node_index] = self.node_paths[self.current_node_index] + [self.maze[self.current_node_index]]
         self.solution = self.node_paths[self.current_node_index]
-        if self.current_node_index == self.target_node_index: self.solved = True
-        else: self.solved = False
+        self.solved = True
         return self.solved
+
+    def get_incomplete_solution_nodes(self) -> List[MazeNode]:
+        node_indexes = [key for key in self.visit_statuses.keys() if self.visit_statuses[key]]
+        return [self.maze[node_index] for node_index in node_indexes]
 
     def get_nearest_node_index(self):
         shortest_distance = 9999999
