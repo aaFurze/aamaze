@@ -16,6 +16,9 @@ WALL_COLOUR = [32, 160, 32]
 SOLUTION_TILE_COLOUR = [32, 32, 240]
 BACKGROUND_COLOUR = [240, 250, 250]
 
+FPS_COUNTER_COLOUR = [4, 4, 4]
+FPS_COUNTER_SIZE = 24
+
 pygame.init()
 
 
@@ -30,15 +33,15 @@ class GraphicsApp:
         self.running = True
     
         self._clock = pygame.time.Clock()
+        self._ticks: int = 0
         self._events = List[pygame.event.Event]
+
+        self.fps_font = pygame.font.Font(None, FPS_COUNTER_SIZE)
     
     def _get_window_size(self) -> List[int]:
         monitor_size = pygame.display.get_desktop_sizes()[TARGET_MONITOR_NUM - 1]
-
-        width = min(TARGET_WINDOW_WIDTH, int(monitor_size[0] * 9 / 10 ))
-
-        return [int(width),
-             int(width / TARGET_ASPECT_RATIO[0] * TARGET_ASPECT_RATIO[1])]
+        window_width = int(min(TARGET_WINDOW_WIDTH, monitor_size[0] * 9 / 10 ))
+        return [window_width, int(window_width / TARGET_ASPECT_RATIO[0] * TARGET_ASPECT_RATIO[1])]
 
     def run(self):
         draw_properties = DrawProperties()
@@ -58,10 +61,13 @@ class GraphicsApp:
             
             self.window.blit(draw_properties.surface, draw_properties.surface_offset) 
 
+            self.draw_fps_counter()
+
 
             self.event_loop()
             pygame.display.update()
             self.window.fill(BACKGROUND_COLOUR)
+            self._ticks = self._clock.tick(TARGET_FPS)
 
     
     def event_loop(self):
@@ -70,6 +76,12 @@ class GraphicsApp:
             if event.type == pygame.QUIT:
                 self.running = False
     
+    def draw_fps_counter(self):
+        fps = int(1000 / max(1, self._ticks))
+
+        fps_surface = self.fps_font.render(f"FPS: {fps} ({int(self._ticks)}ms)", True, FPS_COUNTER_COLOUR, [200, 200, 200])
+        self.window.blit(fps_surface, [self.window.get_width() - 160, FPS_COUNTER_SIZE])
+        
 
 
 class DrawMaze:

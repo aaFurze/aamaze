@@ -15,7 +15,7 @@ from aamaze.solving.flood_fill import FloodFillSolutionCheck
 
 
 def run():
-    test_maze = Maze(32, 32, start_filled=False)
+    test_maze = Maze(100, 64, start_filled=False)
     RecursiveDivisorGenerationAlgorithm(test_maze).generate_maze()
     # EllersGenerationAlgorithm(test_maze).generate_maze()
     # KruskalsGenerationAlgorithm(test_maze).generate_maze()
