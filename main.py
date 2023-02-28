@@ -24,10 +24,10 @@ def run():
     print("Generated Maze")
 
 
-    # solution = FloodFillSolutionCheck(test_maze)
-    # solution.solve_maze()
+    solution = FloodFillSolutionCheck(test_maze)
+    #solution.solve_maze()
 
-    solution = AStarSolvingAlgorithm(test_maze)
+    #solution = AStarSolvingAlgorithm(test_maze)
     
 
     print(f"Solved Maze in {solution.step_counter} steps.")
