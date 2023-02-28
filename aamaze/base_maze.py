@@ -39,42 +39,42 @@ class GenerationAlgorithm(ABC):
 
     @staticmethod
     def add_walls(current_node: MazeNode, neighbour_node: MazeNode):
-        if neighbour_node.x > current_node.x:
+        if neighbour_node.x == current_node.x + 1 and neighbour_node.y == current_node.y:
             neighbour_node.walls |= 0b00000010
             current_node.walls |= 0b00000001
             return
         
-        if neighbour_node.x < current_node.x:
+        if neighbour_node.x == current_node.x - 1 and neighbour_node.y == current_node.y:
             neighbour_node.walls |= 0b00000001
             current_node.walls |= 0b00000010
             return
         
-        if neighbour_node.y > current_node.y:
-            neighbour_node.walls |= 0b00001011
-            current_node.walls |= 0b00000111
+        if neighbour_node.y == current_node.y + 1 and neighbour_node.x == current_node.x:
+            neighbour_node.walls |= 0b00000100
+            current_node.walls |= 0b00001000
             return
-        if neighbour_node.y < current_node.y:
+        if neighbour_node.y == current_node.y - 1 and neighbour_node.x == current_node.x:
             neighbour_node.walls |= 0b00001000
             current_node.walls |= 0b00000100
             return
 
     @staticmethod
     def remove_walls(current_node: MazeNode, neighbour_node: MazeNode):
-        if neighbour_node.x > current_node.x:
+        if neighbour_node.x == current_node.x + 1 and neighbour_node.y == current_node.y:
             neighbour_node.walls &= 0b00001101
             current_node.walls &= 0b00001110
             return
         
-        if neighbour_node.x < current_node.x:
+        if neighbour_node.x == current_node.x - 1 and neighbour_node.y == current_node.y:
             neighbour_node.walls &= 0b00001110
             current_node.walls &= 0b00001101
             return
         
-        if neighbour_node.y > current_node.y:
+        if neighbour_node.y == current_node.y + 1 and neighbour_node.x == current_node.x:
             neighbour_node.walls &= 0b00001011
             current_node.walls &= 0b00000111
             return
-        if neighbour_node.y < current_node.y:
+        if neighbour_node.y == current_node.y - 1 and neighbour_node.x == current_node.x:
             neighbour_node.walls &= 0b00000111
             current_node.walls &= 0b00001011
             return
@@ -113,11 +113,12 @@ class SolvingAlgorithm(ABC):
 
 class Maze():
 
-    def __init__(self, w: int, h: int) -> None:
+    def __init__(self, w: int, h: int, start_filled: bool = True) -> None:
         # (0, 0) is the bottom left of any maze.
         self.w = w
         self.h = h
-        self.maze_body: List[MazeNode] = self.generate_blank_maze(self.w, self.h)
+        self.start_filled = start_filled
+        self.maze_body: List[MazeNode] = self.generate_blank_maze(self.w, self.h, start_filled)
 
         self._index = 0
 
@@ -132,16 +133,25 @@ class Maze():
         if node_1.x == node_2.x + 1 and node_1.walls & LEFT_WALL: return True
         if node_1.x == node_2.x - 1 and node_1.walls & RIGHT_WALL: return True
         return False
+
+
+    def generate_blank_maze(self, width: int, height: int, start_filled: bool) -> List[MazeNode]:
+        if start_filled: return self._generate_filled_maze(width, height)
+        return self._generate_empty_maze(width, height)
     
-
-    def generate_blank_maze(self, width: int, height: int) -> List[MazeNode]:
-        output = []
-
-        for i in range(width * height):
-            output.append(MazeNode(i % width, i // width, 0b00001111))
+    def _generate_empty_maze(self, width: int, height: int) -> List[MazeNode]:
+        maze = [MazeNode(i % width, i // width, 0b00000000) for i in range(width * height)]
         
-        return output
-    
+        for i in range(0, width): maze[i].walls |= BOTTOM_WALL
+        for i in range((height - 1) * width, width * height): maze[i].walls |= TOP_WALL
+        for i in range(0, width * height, width): maze[i].walls |= LEFT_WALL
+        for i in range(width - 1, height * width, width): maze[i].walls |= RIGHT_WALL
+
+        return maze
+
+    def _generate_filled_maze(self, width: int, height: int) -> List[MazeNode]:
+        return [MazeNode(i % width, i // width, 0b00001111) for i in range(width * height)]
+
     @classmethod
     def get_generated_maze(cls, maze: Maze,
      generation_algorithm: GenerationAlgorithm) -> Maze:
