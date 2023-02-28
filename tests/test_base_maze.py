@@ -2,7 +2,8 @@ from typing import List
 
 import pytest
 
-from aamaze.base_maze import GenerationAlgorithm, Maze, MazeNode
+from aamaze.base_maze import (BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, TOP_WALL,
+                              GenerationAlgorithm, Maze, MazeNode)
 
 
 class MockGenerationAlgorithm(GenerationAlgorithm):
@@ -14,7 +15,7 @@ class MockGenerationAlgorithm(GenerationAlgorithm):
 
 @pytest.fixture
 def mock_maze() -> Maze:
-    return Maze(5, 6)
+    return Maze(5, 6, start_filled=True)
 
 @pytest.fixture
 def maze_node_all_walls() -> MazeNode:
@@ -24,6 +25,9 @@ def maze_node_all_walls() -> MazeNode:
 def maze_node_l_b_walls() -> MazeNode:
     return MazeNode(2, 4, 0b00000110)
 
+@pytest.fixture
+def mock_maze_empty() -> Maze:
+    return Maze(8, 8, start_filled=False)
 
 
 class TestMaze:
@@ -72,7 +76,56 @@ class TestMaze:
     def test_get_node_invalid_input(self, mock_maze: Maze, x, y):
         node = mock_maze.get_node_from_coordinates(x, y)
         assert node is None
+    
+    @pytest.mark.parametrize("index", [i for i in range(64)])
+    def test_empty_maze_middle_is_empty(self, mock_maze_empty: Maze, index: int):
+        if index <= mock_maze_empty.w or index >= mock_maze_empty.size - mock_maze_empty.w: return
+        if index % mock_maze_empty.w == 0 or index % mock_maze_empty.w == mock_maze_empty.w - 1: return
 
+        assert mock_maze_empty[index].walls == 0
+
+    @pytest.mark.parametrize("index", [i for i in range(64)])
+    def test_empty_maze_has_outside_walls(self, mock_maze_empty: Maze, index: int):
+        if index > mock_maze_empty.w and index < mock_maze_empty.size - mock_maze_empty.w:
+            if index % mock_maze_empty.w != 0 and index % mock_maze_empty.w != mock_maze_empty.w - 1: return
+        assert mock_maze_empty[index].walls != 0
+    
+    @pytest.mark.parametrize("index", [2, 23, 53, 12, 7, 8, 0])
+    def test_add_walls_above(self, mock_maze_empty: Maze, index: int):
+        GenerationAlgorithm.add_walls(mock_maze_empty[index], mock_maze_empty[index + mock_maze_empty.w])
+
+        assert mock_maze_empty[index].walls & TOP_WALL
+        assert mock_maze_empty[index + mock_maze_empty.w].walls & BOTTOM_WALL
+
+
+    @pytest.mark.parametrize("index", [57, 23, 56, 12, 59, 8, 63])
+    def test_add_walls_below(self, mock_maze_empty: Maze, index: int):
+        GenerationAlgorithm.add_walls(mock_maze_empty[index], mock_maze_empty[index - mock_maze_empty.w])
+
+        assert mock_maze_empty[index].walls & BOTTOM_WALL
+        assert mock_maze_empty[index - mock_maze_empty.w].walls & TOP_WALL
+
+    @pytest.mark.parametrize("index", [58, 23, 56, 12, 59, 16, 63])
+    def test_add_walls_left(self, mock_maze_empty: Maze, index: int):
+        GenerationAlgorithm.add_walls(mock_maze_empty[index], mock_maze_empty[index - 1])
+
+        assert mock_maze_empty[index].walls & LEFT_WALL
+        assert mock_maze_empty[index - 1].walls & RIGHT_WALL
+
+    @pytest.mark.parametrize("index", [57, 23, 56, 12, 59, 8, 0])
+    def test_add_walls_right(self, mock_maze_empty: Maze, index: int):
+        GenerationAlgorithm.add_walls(mock_maze_empty[index], mock_maze_empty[index + 1])
+
+        assert mock_maze_empty[index].walls & RIGHT_WALL
+        assert mock_maze_empty[index + 1].walls & LEFT_WALL
+    
+    @pytest.mark.parametrize("index1, index2, correct_value1, correct_value2", [
+        (0, 2, 6, 4), (9, 42, 0, 0), (63, 61, 9, 8), (41, 39, 0, 1), (15, 16, 1, 2), (15, 15, 1, 1)])
+    def test_add_walls_invalid_walls_not_created(self, mock_maze_empty: Maze, index1: int, index2: int, correct_value1, correct_value2):
+        GenerationAlgorithm.add_walls(mock_maze_empty[index1], mock_maze_empty[index2])
+
+        assert mock_maze_empty[index1].walls == correct_value1
+        assert mock_maze_empty[index2].walls == correct_value2
 
 class TestMazeNode:
     def test_all_walls_filled_direct(self, maze_node_all_walls: MazeNode):
