@@ -8,7 +8,7 @@ from aamaze.base_maze import (BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, TOP_WALL,
                               Maze, MazeNode, SolvingAlgorithm)
 
 TARGET_ASPECT_RATIO = [16, 9]
-TARGET_WINDOW_WIDTH = 1280
+TARGET_WINDOW_WIDTH = 1920 # 1280
 TARGET_FPS = 60
 TARGET_MONITOR_NUM = 1
 
@@ -36,6 +36,8 @@ class GraphicsApp:
         self._ticks: int = 0
         self._events = List[pygame.event.Event]
 
+        self.step_calls_per_frame = 1
+
         self.fps_font = pygame.font.Font(None, FPS_COUNTER_SIZE)
     
     def _get_window_size(self) -> List[int]:
@@ -56,7 +58,7 @@ class GraphicsApp:
                 if self.maze_solver.solved:
                     DrawMaze.draw_maze_solution(self.maze_solver.solution, draw_properties)
                 else:
-                    self.maze_solver.step()
+                    for _ in range(self.step_calls_per_frame): self.maze_solver.step()
                     DrawMaze.draw_maze_solution(self.maze_solver.get_incomplete_solution_nodes(), draw_properties)
             
             self.window.blit(draw_properties.surface, draw_properties.surface_offset) 
