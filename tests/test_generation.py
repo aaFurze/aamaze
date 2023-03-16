@@ -4,13 +4,14 @@ from aamaze.base_maze import GenerationAlgorithm, Maze
 from aamaze.generation import (KruskalsGenerationAlgorithm,
                                PrimsGenerationAlgorithm,
                                RecursiveBacktrackerAlgorithm,
-                               RecursiveDivisorGenerationAlgorithm)
+                               RecursiveDivisorGenerationAlgorithm,
+                               WilsonsGenerationAlgorithm)
 from aamaze.solving import AStarSolvingAlgorithm, FloodFillSolutionCheck
 
 # Maze needs to start filled for algorithm to work.
 start_filled_algorithms = [
     KruskalsGenerationAlgorithm, PrimsGenerationAlgorithm,
-    RecursiveBacktrackerAlgorithm
+    RecursiveBacktrackerAlgorithm, WilsonsGenerationAlgorithm
 ]
 # Maze needs to start empty for algorithm to work.
 start_empty_algorithms = [RecursiveDivisorGenerationAlgorithm]

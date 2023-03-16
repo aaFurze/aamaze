@@ -8,7 +8,7 @@ from aamaze.base_maze import (BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, TOP_WALL,
                               Maze, MazeNode, SolvingAlgorithm)
 
 TARGET_ASPECT_RATIO = [16, 9]
-TARGET_WINDOW_WIDTH = 1920 # 1280
+TARGET_WINDOW_WIDTH = 1280
 TARGET_FPS = 60
 TARGET_MONITOR_NUM = 1
 
@@ -90,7 +90,7 @@ class DrawMaze:
     @classmethod
     def draw_maze_solution(cls, solution: List[MazeNode], draw_properties: DrawProperties):
 
-        solution_circle_size = max((draw_properties.tile_size - draw_properties.wall_width) // 3, 1)
+        solution_circle_size = max((draw_properties.tile_size - draw_properties.wall_width) // 3, 2)
         for node in solution:
             position = [node.x * draw_properties.tile_size + ((draw_properties.tile_size + draw_properties.wall_width) // 2),
              draw_properties.surface.get_height() - ((node.y + 1) * draw_properties.tile_size) + ((draw_properties.tile_size - draw_properties.wall_width) // 2)]

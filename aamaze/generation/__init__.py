@@ -2,3 +2,4 @@ from .kruskals import KruskalsGenerationAlgorithm
 from .prims import PrimsGenerationAlgorithm
 from .recursive_backtracker import RecursiveBacktrackerAlgorithm
 from .recursive_divisior import RecursiveDivisorGenerationAlgorithm
+from .wilsons import WilsonsGenerationAlgorithm
