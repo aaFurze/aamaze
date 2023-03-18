@@ -1,3 +1,4 @@
+from .growing_tree import GrowingTreeGenerationAlgorithm
 from .kruskals import KruskalsGenerationAlgorithm
 from .prims import PrimsGenerationAlgorithm
 from .recursive_backtracker import RecursiveBacktrackerAlgorithm
