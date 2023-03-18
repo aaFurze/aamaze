@@ -25,7 +25,7 @@ def run():
     # PrimsGenerationAlgorithm(test_maze).generate_maze()
     # RecursiveBacktrackerAlgorithm(test_maze).generate_maze()
     # WilsonsGenerationAlgorithm(test_maze).generate_maze()
-    GrowingTreeGenerationAlgorithm(test_maze).generate_maze()
+    GrowingTreeGenerationAlgorithm(test_maze, mode="random").generate_maze()
     print("Generated Maze")
 
 
