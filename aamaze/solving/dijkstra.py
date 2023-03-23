@@ -8,7 +8,7 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
 
-        self.target_node_index = self.maze.size - 1
+        self.target_node_index: int
         self.current_node_index: int
 
         self.unvisited_nodes: List[int]
@@ -23,7 +23,8 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
         self.node_paths = [[] for _ in range(0, self.maze.size)]
         self.solution = []
         self.step_counter = 0
-        self.current_node_index = 0  # start node
+        self.target_node_index = self.maze.exit_node.x + (self.maze.exit_node.y * self.maze.w)
+        self.current_node_index = self.maze.entrance_node.x + (self.maze.entrance_node.y * self.maze.w)
 
     def solve_maze(self) -> List[MazeNode]:
 

@@ -14,6 +14,7 @@ class AStarSolvingAlgorithm(SolvingAlgorithm):
         self.closed_nodes: List[PathNode]
 
         self.current_node: PathNode
+        self.start_node_index = self.maze.entrance_node.x + (self.maze.entrance_node.y * self.maze.w)
         self.target_node_index = self.maze.size - 1
         self.target_node: PathNode
 
@@ -23,8 +24,8 @@ class AStarSolvingAlgorithm(SolvingAlgorithm):
     def setup_data_structures(self):
         self.path_nodes = self.get_open_nodes_list()
 
-        self.current_node = self.path_nodes[0]
-        self.path_nodes[0].g_value = 0
+        self.current_node = self.path_nodes[self.start_node_index]
+        self.path_nodes[self.start_node_index].g_value = 0
 
         self.open_nodes = [self.current_node]
         self.closed_nodes = []

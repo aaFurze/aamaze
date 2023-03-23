@@ -63,6 +63,9 @@ class EllersGenerationAlgorithm(GenerationAlgorithm):
                     if random.randint(0, 2): continue
                     node_dict[index + self.maze.w] = node_dict[index]
                     self.remove_walls(self.maze[index], self.maze[index + self.maze.w])
+        
+
+        self.create_entrance_and_exit()
 
 
         

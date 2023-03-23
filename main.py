@@ -19,7 +19,7 @@ from aamaze.solving.flood_fill import FloodFillSolutionCheck
 
 def run():
 
-    test_maze = Maze(32, 32, start_filled=True)
+    test_maze = Maze(32, 32, start_filled=True, entrance_index=150, exit_index=-30)
     # RecursiveDivisorGenerationAlgorithm(test_maze).generate_maze()
     EllersGenerationAlgorithm(test_maze).generate_maze()
     # KruskalsGenerationAlgorithm(test_maze).generate_maze()
@@ -30,19 +30,19 @@ def run():
     print("Generated Maze")
 
 
-    solution = FloodFillSolutionCheck(test_maze)
+    # solution = FloodFillSolutionCheck(test_maze)
 
 
     # solution = AStarSolvingAlgorithm(test_maze)
-    # solution = DijkstraSolvingAlgorithm(test_maze)
+    solution = DijkstraSolvingAlgorithm(test_maze)
     
-    # solution.solve_maze()
+    solution.solve_maze()
     print(f"Solved Maze in {solution.step_counter} steps.")
     print(solution.solved)
     print(len(solution.solution))
 
     app = GraphicsApp(test_maze, solution)
-    app.step_calls_per_frame = 10
+    app.step_calls_per_frame = 1
     app.run()
 
 

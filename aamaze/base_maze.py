@@ -36,6 +36,21 @@ class GenerationAlgorithm(ABC):
     def generate_maze(self) -> Maze:
         ...
 
+    def create_entrance_and_exit(self):
+        self.try_create_outside_opening(self.maze, self.maze.entrance_node)
+        self.try_create_outside_opening(self.maze, self.maze.exit_node)
+        
+
+    @classmethod
+    def try_create_outside_opening(cls, maze: Maze, node: MazeNode):
+        if node.x == 0: node.walls &= 0b1101
+        elif node.x == maze.w - 1: node.walls &= 0b1110
+        elif node.y == 0: node.walls &= 0b1011
+        elif node.y == maze.h - 1: node.walls &= 0b0111
+
+        # If Node is not on the edge of the maze, do nothing.
+
+
 
     @staticmethod
     def add_walls(current_node: MazeNode, neighbour_node: MazeNode):
@@ -113,7 +128,7 @@ class SolvingAlgorithm(ABC):
 
 class Maze():
 
-    def __init__(self, w: int, h: int, start_filled: bool = True) -> None:
+    def __init__(self, w: int, h: int, start_filled: bool = True, entrance_index: int = 0, exit_index: int = -1) -> None:
         # (0, 0) is the bottom left of any maze.
         self.w = w
         self.h = h
@@ -122,6 +137,8 @@ class Maze():
 
         self._index = 0
 
+        self.entrance_node: MazeNode = self[entrance_index]
+        self.exit_node: MazeNode = self[exit_index]
 
     @property
     def size(self) -> int:

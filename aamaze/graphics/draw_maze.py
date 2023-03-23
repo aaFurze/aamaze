@@ -15,6 +15,8 @@ TARGET_MONITOR_NUM = 1
 WALL_COLOUR = [32, 160, 32]
 SOLUTION_TILE_COLOUR = [32, 32, 240]
 BACKGROUND_COLOUR = [240, 250, 250]
+ENTRANCE_TILE_COLOUR = [40, 200, 40]
+EXIT_TILE_COLOUR = [200, 40, 40]
 
 FPS_COUNTER_COLOUR = [4, 4, 4]
 FPS_COUNTER_SIZE = 24
@@ -108,6 +110,11 @@ class DrawMaze:
                 cls.draw_left_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)
             if node.walls & RIGHT_WALL: 
                 cls.draw_right_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)   
+        
+        cls.draw_end(draw_properties.surface, ENTRANCE_TILE_COLOUR, maze.entrance_node.x - 1, maze.entrance_node.y,
+                           draw_properties.wall_width, draw_properties.tile_size)
+        cls.draw_end(draw_properties.surface, EXIT_TILE_COLOUR, maze.exit_node.x - 1, maze.exit_node.y,
+                           draw_properties.wall_width, draw_properties.tile_size)
 
 
 
@@ -142,6 +149,13 @@ class DrawMaze:
         wall_dimensions = [wall_width, tile_size - wall_width]
 
         pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
+
+
+    @staticmethod
+    def draw_end(window: pygame.Surface, colour: List[int], x: int, y: int, wall_width: int, tile_size: int):
+        position = [x * tile_size + tile_size + wall_width, (window.get_height() - (y + 1) * tile_size)]
+        tile_dimensions = [tile_size - wall_width, tile_size - wall_width]
+        pygame.draw.rect(window, colour, [*position, *tile_dimensions])
 
 
 
