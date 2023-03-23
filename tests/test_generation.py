@@ -1,7 +1,8 @@
 import pytest
 
 from aamaze.base_maze import GenerationAlgorithm, Maze
-from aamaze.generation import (GrowingTreeGenerationAlgorithm,
+from aamaze.generation import (EllersGenerationAlgorithm,
+                               GrowingTreeGenerationAlgorithm,
                                KruskalsGenerationAlgorithm,
                                PrimsGenerationAlgorithm,
                                RecursiveBacktrackerAlgorithm,
@@ -12,7 +13,7 @@ from aamaze.solving import AStarSolvingAlgorithm, FloodFillSolutionCheck
 # Maze needs to start filled for algorithm to work.
 start_filled_algorithms = [
     KruskalsGenerationAlgorithm, PrimsGenerationAlgorithm,
-    RecursiveBacktrackerAlgorithm, WilsonsGenerationAlgorithm, GrowingTreeGenerationAlgorithm
+    RecursiveBacktrackerAlgorithm, WilsonsGenerationAlgorithm, GrowingTreeGenerationAlgorithm, EllersGenerationAlgorithm
 ]
 # Maze needs to start empty for algorithm to work.
 start_empty_algorithms = [RecursiveDivisorGenerationAlgorithm]

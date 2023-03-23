@@ -24,7 +24,7 @@ pygame.init()
 
 
 class GraphicsApp:
-    def __init__(self, maze: Maze, maze_solver: SolvingAlgorithm) -> None:
+    def __init__(self, maze: Maze, maze_solver: SolvingAlgorithm = None) -> None:
         self.maze = maze
         self.maze_solver = maze_solver
         window_size = self._get_window_size()

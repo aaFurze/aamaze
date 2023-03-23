@@ -11,92 +11,75 @@ class EllersGenerationAlgorithm(GenerationAlgorithm):
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
     
-    """
-    TODO: Final row is currently just all set to blank nodes (no walls).
-    """
-
     def generate_maze(self) -> Maze:
-        y = 0
+        row = 0
 
-        current_row_node_sets: List[MutableSet[int]] = []
+        node_dict: Dict[int, int] = {}
 
-        while y + 1 < self.maze.size:
-            current_row_node_sets = []
-            # increment by 1
-            x = 0
-            # Create individual sets for first row.
-            while x < self.maze.w:
-                current_row_node_sets.append(MutableSet(self.maze[x + y].x + (self.maze[x + y].y * self.maze.w)))
-                x += 1
+        while row < self.maze.h:
             
-            # For each set (barring first)
-            for x in range(1, len(current_row_node_sets)):
-                # If are not same set.
-                if current_row_node_sets[x] is not current_row_node_sets[x - 1]:
-                    # If == 1: Merge sets and remove walls between nodes.
-                    if random.randint(0, 2):
-                        current_row_node_sets[x] = current_row_node_sets[x - 1].union(current_row_node_sets[x])     
-                        self.remove_walls(self.maze[x + y], self.maze[y + x - 1])  
+            self.remove_redundant_nodes(node_dict, row)
+            self.add_nodes_to_dict(row, node_dict)
+
+            # Create horizontal connections.
+            for i in range(1, self.maze.w):
+                # Don't make connections between nodes in the same set (already have path between them).
+                if node_dict[i + (row * self.maze.w)] == node_dict[i - 1 + (row * self.maze.w)]: continue
+
+                if random.randint(0, 2) > 0:
+                    self.merge_nodes(node_dict, node_dict[i + (row * self.maze.w)], node_dict[i - 1 + (row * self.maze.w)])
+                    self.remove_walls(self.maze[i + (row * self.maze.w)], self.maze[i - 1 + (row * self.maze.w)])
             
+            row += 1
 
-            sets_checked_ids = []
+            # Do not make upwards connections on the final row (out of bounds error).
+            # Instead, merge any remaining sets together to form one final set containing all MazeNode indexes.
+            if row == self.maze.h:
+                for i in range(1, self.maze.w):
+                    if node_dict[i + ((row - 1) * self.maze.w)] != node_dict[i - 1 + ((row - 1) * self.maze.w)]:
+                        self.merge_nodes(node_dict, node_dict[i + ((row - 1) * self.maze.w)], node_dict[i - 1 + ((row - 1) * self.maze.w)])
+                        self.remove_walls(self.maze[i + ((row - 1) * self.maze.w)], self.maze[i - 1 + ((row - 1) * self.maze.w)])
+                continue
 
-            if y + self.maze.w >= self.maze.size:
-                for i in range(self.maze.size - self.maze.w, self.maze.size - 1):
-                    self.remove_walls(self.maze[i], self.maze[i - 1])
-                    self.remove_walls(self.maze[i], self.maze[i + 1])
+            # Get Nodes which can be used to form an upwards connection and group them by their respective set
+            # Need to be on correct row to be eligible.
+            eligible_upward_nodes: Dict[int: List[int]] = {}
 
-                
-                break
-                    
+            for node_index in list(node_dict.keys()):
+                if self.maze.w * row > node_index >= self.maze.w * (row - 1):
+                    if not eligible_upward_nodes.get(node_dict[node_index]):
+                        eligible_upward_nodes[node_dict[node_index]] = []
+                    eligible_upward_nodes[node_dict[node_index]].append(node_index)
 
-                    
-            # For each set in current node, make a 
-            for c_node_set in current_row_node_sets:
-                # Prevent duplicate calls.
-                if id(c_node_set) in sets_checked_ids: continue
-                sets_checked_ids.append(id(c_node_set))
-
-                # Pick a random node in the set.
-                random_node_id = list(c_node_set)[random.randint(0, len(c_node_set) - 1)]
-                above_node_id = random_node_id + self.maze.w
-                self.remove_walls(self.maze[random_node_id], self.maze[above_node_id])
-    
-            y += self.maze.w 
-
-
-        return self.maze
+            # Make one upward connection for each Set.
+            for key in list(eligible_upward_nodes.keys()):
+                node = self.maze[random.choice(eligible_upward_nodes[key])]
+                node_dict[node.x + ((node.y + 1) * self.maze.w)] = key
+                self.remove_walls(node, self.maze[node.x + ((node.y + 1) * self.maze.w)])
+            
+            # Make random upward connections for each eligible MazeNode.
+            for key in list(eligible_upward_nodes.keys()):
+                for index in eligible_upward_nodes[key]:
+                    if random.randint(0, 2): continue
+                    node_dict[index + self.maze.w] = node_dict[index]
+                    self.remove_walls(self.maze[index], self.maze[index + self.maze.w])
 
 
+        
+    def add_nodes_to_dict(self, row: int, node_ids: Dict[int, int]):
+        for i in range(self.maze.w):
+            node_index = i + (row * self.maze.w)
 
-class MutableSet:
-    def __init__(self, value: Union[set, Any]) -> None:
-        self.value = value
-        if type(self.value) is not set:
-            self.value = {value}
-    
-    def __eq__(self, __o: object) -> bool:
-        if hasattr(__o, "value"): return self.value == __o.value
-        return False
-    
-    def __len__(self):
-        return len(self.value)
-    
-    def union(self, other: Union[set, MutableSet]):
-        if type(other) is set: self.value = self.value.union(other) 
-        if type(other) is MutableSet: self.union(other.value)
+            if node_ids.get(node_index, -1) == -1:
+                node_ids[node_index] = node_index
+        
+    def merge_nodes(self, node_dict: Dict[int, int], index: int, other_index: int):
+        keys = list(node_dict.keys())
+        for key in keys:
+            if node_dict[key] == other_index:
+                node_dict[key] = index
 
-        return self
-    
-    def __iter__(self):
-        return iter(list(self.value))
-    
-    def __repr__(self):
-        return f"MutableSet({self.value})"
-    
-    def remove(self, value: Any):
-        self.value.remove(value)
-    
-    def intersection(self, other_set: Union[MutableSet, set]) -> Union[MutableSet, set]:
-        if type(other_set) is MutableSet: return MutableSet(self.value.intersection(other_set.value))
-        if type(other_set) is set: return self.value.intersection(other_set)
+    def remove_redundant_nodes(self, node_dict: Dict[int , int], row: int):
+        for key in list(node_dict.keys()):
+            if key < self.maze.w * (row - 2):
+                node_dict.pop(key)
