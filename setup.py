@@ -11,7 +11,7 @@ if os.path.isfile(requirement_path):
 
 setup(
     name="aamaze",
-    version="0.0.3",
+    version="0.0.5",
     description="A python library for generating, solving and displaying mazes.",
     install_requires=install_requires,
     package_dir={"": "aamaze"},
