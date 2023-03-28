@@ -33,16 +33,16 @@ def run():
     # solution = FloodFillSolutionCheck(test_maze)
 
 
-    # solution = AStarSolvingAlgorithm(test_maze)
-    solution = DijkstraSolvingAlgorithm(test_maze)
+    solution = AStarSolvingAlgorithm(test_maze)
+    # solution = DijkstraSolvingAlgorithm(test_maze)
     
-    solution.solve_maze()
+    # solution.solve_maze()
     print(f"Solved Maze in {solution.step_counter} steps.")
     print(solution.solved)
     print(len(solution.solution))
 
     app = GraphicsApp(test_maze, solution)
-    app.step_calls_per_frame = 1
+    app.step_calls_per_frame = 5
     app.run()
 
 

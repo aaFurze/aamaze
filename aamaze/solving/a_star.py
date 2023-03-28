@@ -15,7 +15,7 @@ class AStarSolvingAlgorithm(SolvingAlgorithm):
 
         self.current_node: PathNode
         self.start_node_index = self.maze.entrance_node.x + (self.maze.entrance_node.y * self.maze.w)
-        self.target_node_index = self.maze.size - 1
+        self.target_node_index = self.maze.exit_node.x + (self.maze.exit_node.y * self.maze.w)
         self.target_node: PathNode
 
         self.setup_data_structures()
