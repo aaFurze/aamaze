@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Union
+from typing import List
 
 import pygame
 
@@ -29,9 +29,10 @@ class GraphicsApp:
     def __init__(self, maze: Maze, maze_solver: SolvingAlgorithm = None) -> None:
         self.maze = maze
         self.maze_solver = maze_solver
-        window_size = self._get_window_size()
-        print(f"window_size={window_size}")
-        self.window = pygame.display.set_mode(window_size)
+        self.window_size = self._get_window_size()
+        print(f"Running Graphics App (window size = {self.window_size})")
+        self.window: pygame.Surface
+
         self.running = True
     
         self._clock = pygame.time.Clock()
@@ -48,6 +49,8 @@ class GraphicsApp:
         return [window_width, int(window_width / TARGET_ASPECT_RATIO[0] * TARGET_ASPECT_RATIO[1])]
 
     def run(self):
+        self.window = pygame.display.set_mode(self.window_size)
+
         draw_properties = DrawProperties()
         draw_properties.configure_properties(self.window, self.maze)
 
@@ -67,18 +70,19 @@ class GraphicsApp:
 
             self.draw_fps_counter()
 
-
-            self.event_loop()
             pygame.display.update()
             self.window.fill(BACKGROUND_COLOUR)
             self._ticks = self._clock.tick(TARGET_FPS)
+            self.event_loop()
 
     
     def event_loop(self):
         self._events = pygame.event.get()
         for event in self._events:
             if event.type == pygame.QUIT:
+                print("Closing Application")
                 self.running = False
+                pygame.quit()
     
     def draw_fps_counter(self):
         fps = int(1000 / max(1, self._ticks))

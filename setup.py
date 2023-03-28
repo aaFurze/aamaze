@@ -6,7 +6,7 @@ from metadata import (NAME, PACKAGE_DIRECTORY, PACKAGES, PYTHON_REQUIRES,
                       SHORT_DESCRIPTION, SOURCE_URL, VERSION)
 
 lib_folder = os.path.dirname(os.path.realpath(__file__))
-requirement_path = lib_folder + "/requirements.txt"
+requirement_path = lib_folder + "/release_requirements.txt"
 
 install_requires = []
 if os.path.isfile(requirement_path):
