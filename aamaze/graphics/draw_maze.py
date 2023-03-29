@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import os
 from typing import List
-
-import pygame
 
 from aamaze.base_maze import (BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, TOP_WALL,
                               Maze, MazeNode, SolvingAlgorithm)
+
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
+import pygame
 
 pygame.init()
 

@@ -2,7 +2,7 @@
 NAME = "aamaze"
 
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 SHORT_DESCRIPTION = "A python library for generating, solving and displaying mazes."
 PACKAGES = ["", "generation", "graphics", "solving"]
 PACKAGE_DIRECTORY = {"": "aamaze"}

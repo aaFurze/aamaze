@@ -1,6 +1,3 @@
-import random
-import time
-
 from aamaze.base_maze import Maze
 from aamaze.generation.eller import EllersGenerationAlgorithm
 from aamaze.generation.growing_tree import GrowingTreeGenerationAlgorithm
@@ -19,7 +16,7 @@ from aamaze.solving.flood_fill import FloodFillSolutionCheck
 
 def run():
 
-    test_maze = Maze(100, 100, start_filled=True, entrance_index=150, exit_index=-30)
+    test_maze = Maze(64, 64, start_filled=True, entrance_index=150, exit_index=-30)
     # RecursiveDivisorGenerationAlgorithm(test_maze).generate_maze()
     EllersGenerationAlgorithm(test_maze).generate_maze()
     # KruskalsGenerationAlgorithm(test_maze).generate_maze()
