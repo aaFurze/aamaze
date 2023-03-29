@@ -25,6 +25,11 @@ FPS_COUNTER_SIZE = 24
 FPS_FONT = pygame.font.Font(None, FPS_COUNTER_SIZE)
 
 
+STEP_COLOUR = [4, 4, 4]
+STEP_SIZE = 24 
+STEP_FONT = pygame.font.Font(None, STEP_SIZE)
+
+
 
 class GraphicsApp:
     def __init__(self, maze: Maze, maze_solver: SolvingAlgorithm = None) -> None:
@@ -40,7 +45,18 @@ class GraphicsApp:
         self._ticks: int = 0
         self._events = List[pygame.event.Event]
 
-        self.step_calls_per_frame = 1
+        self._step_calls_per_second = 50
+        self._step_call_increment = 1000 / self._step_calls_per_second
+        self._step_call_counter = 0
+        self._run_steps = True
+
+        self.k_space: bool
+        self.k_s: bool
+        self.k_r: bool
+        self.k_plus: bool
+        self.k_minus: bool
+
+        self._reset_keys()
 
 
     def _get_draw_properties(self, window: pygame.Surface, maze: Maze) -> DrawProperties:
@@ -66,27 +82,135 @@ class GraphicsApp:
 
         while self.running:
 
+            self._event_loop()
+            self._ticks = self._clock.tick(TARGET_FPS)
+
+            self._handle_solver_step_calls()
+
             DrawMaze.draw_maze(self.maze, draw_properties)
             if self.maze_solver: 
-                DrawMaze.draw_maze_solution(self.maze_solver, draw_properties, self.step_calls_per_frame)
+                DrawMaze.draw_maze_solution(self.maze_solver, draw_properties)
             self.window.blit(draw_properties.surface, draw_properties.surface_offset)
             
+            DrawMaze.draw_steps_per_second(self.window, self._step_calls_per_second)
             DrawMaze.draw_fps_counter(self.window, self._ticks)
 
             self._late_display_update(draw_properties)
 
-            self._ticks = self._clock.tick(TARGET_FPS)
-            self._event_loop()
 
+        
+        print("Closing Application")
+        pygame.quit()
+
+    def _increase_steps(self):
+        if self._step_calls_per_second > 2000:
+            self._step_calls_per_second += 250
+        elif self._step_calls_per_second > 1000:
+            self._step_calls_per_second += 100
+        elif self._step_calls_per_second > 500:
+            self._step_calls_per_second += 50
+        elif self._step_calls_per_second > 100:
+            self._step_calls_per_second += 25
+        elif self._step_calls_per_second > 50:
+            self._step_calls_per_second += 10
+        elif self._step_calls_per_second > 20:
+            self._step_calls_per_second += 5
+        elif self._step_calls_per_second > 10:
+            self._step_calls_per_second += 2
+        else: self._step_calls_per_second += 1
+
+        self._step_calls_per_second = min(5000, self._step_calls_per_second)
+        self._step_call_increment = 1000 / self._step_calls_per_second
+
+
+    def _decrease_steps(self):
+        if self._step_calls_per_second > 2000:
+            self._step_calls_per_second -= 250
+        elif self._step_calls_per_second > 1000:
+            self._step_calls_per_second -= 100
+        elif self._step_calls_per_second > 500:
+            self._step_calls_per_second -= 50
+        elif self._step_calls_per_second > 100:
+            self._step_calls_per_second -= 25
+        elif self._step_calls_per_second > 50:
+            self._step_calls_per_second -= 10
+        elif self._step_calls_per_second > 20:
+            self._step_calls_per_second -= 5
+        elif self._step_calls_per_second > 10:
+            self._step_calls_per_second -= 2
+        else: self._step_calls_per_second -= 1
+
+        self._step_calls_per_second = max(1, self._step_calls_per_second)
+        self._step_call_increment = 1000 / self._step_calls_per_second
+
+
+    def _handle_solver_step_calls(self):
+        if not self._run_steps: return
+        if not self.maze_solver: return
+        if self.maze_solver.solved: return
+
+        self._step_call_counter = min(1000 * self._step_call_increment, self._step_call_counter + self._ticks)
+        self._step_call_counter = min(250, self._step_call_counter)
+        while self._step_call_counter > self._step_call_increment:
+            self.maze_solver.step()
+            self._step_call_counter -= self._step_call_increment
+
+    def _manual_step_increment(self):
+        if not self.maze_solver: return
+        if self.maze_solver.solved: return
+        self.maze_solver.step()
     
+
+    def _reset_solver(self):
+        if not self.maze_solver: return
+        self.maze_solver.setup_data_structures()
+
     def _event_loop(self):
+        self._reset_keys()
         self._events = pygame.event.get()
+
+
         for event in self._events:
             if event.type == pygame.QUIT:
-                print("Closing Application")
                 self.running = False
-                pygame.quit()
-        
+            elif event.type == pygame.KEYDOWN:
+                self._enable_key(event.dict["key"])
+
+
+            if event.type == pygame.TEXTINPUT:
+                if event.dict["text"] == "s":
+                    self._manual_step_increment()
+                elif event.dict["text"] == "=":
+                    self._increase_steps()
+                elif event.dict["text"] == "-":
+                    self._decrease_steps()
+                
+
+            
+
+    def _reset_keys(self):
+        self.k_space = False
+        self.k_s = False
+        self.k_r = False
+        self.k_plus = False
+        self.k_minus = False
+
+
+    def _enable_key(self, key_code: int):
+        if key_code == pygame.K_SPACE:
+            self.k_space = True
+            self._run_steps = not self._run_steps
+        elif key_code == pygame.K_s:
+            self.k_s = True
+        elif key_code == pygame.K_r:
+            self.k_r = True
+            self._reset_solver()              
+        elif key_code == pygame.K_EQUALS:
+            self.k_plus = True 
+            self._increase_steps()          
+        elif key_code == pygame.K_MINUS:
+            self.k_minus = True
+            self._decrease_steps()
 
 
 class DrawMaze:
@@ -94,7 +218,12 @@ class DrawMaze:
     def draw_fps_counter(cls, window: pygame.Surface, ticks: int):
         fps = int(1000 / max(1, ticks))
         fps_surface = FPS_FONT.render(f"FPS: {fps} ({int(ticks)}ms)", True, FPS_COUNTER_COLOUR, [200, 200, 200])
-        window.blit(fps_surface, [window.get_width() - 160, FPS_COUNTER_SIZE])
+        window.blit(fps_surface, [window.get_width() - 180, FPS_COUNTER_SIZE])
+    
+    @classmethod
+    def draw_steps_per_second(cls, window: pygame.Surface, steps: int):
+        step_surface = FPS_FONT.render(f"Target Steps per Second: {steps}", True, STEP_COLOUR, [200, 200, 200])
+        window.blit(step_surface, [window.get_width() - 240, STEP_SIZE * 2.5])
     
     @classmethod
     def draw_maze(cls, maze: Maze, draw_properties: DrawProperties):
@@ -115,11 +244,10 @@ class DrawMaze:
                            draw_properties.wall_width, draw_properties.tile_size)
     
     @classmethod
-    def draw_maze_solution(cls, maze_solver: SolvingAlgorithm, draw_properties: DrawProperties, step_calls_per_frame: int):
+    def draw_maze_solution(cls, maze_solver: SolvingAlgorithm, draw_properties: DrawProperties):
         if maze_solver.solved:
             DrawMaze._draw_maze_solution_path(maze_solver.solution, draw_properties)
         else:
-            for _ in range(step_calls_per_frame): maze_solver.step()
             DrawMaze._draw_maze_solution_path(maze_solver.get_incomplete_solution_nodes(), draw_properties)
 
 

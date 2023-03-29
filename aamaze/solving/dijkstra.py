@@ -25,6 +25,7 @@ class DijkstraSolvingAlgorithm(SolvingAlgorithm):
         self.step_counter = 0
         self.target_node_index = self.maze.exit_node.x + (self.maze.exit_node.y * self.maze.w)
         self.current_node_index = self.maze.entrance_node.x + (self.maze.entrance_node.y * self.maze.w)
+        self.solved = False
 
     def solve_maze(self) -> List[MazeNode]:
 
