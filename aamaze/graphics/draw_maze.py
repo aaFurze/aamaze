@@ -12,25 +12,43 @@ import pygame
 
 pygame.init()
 
-TARGET_ASPECT_RATIO = [16, 9]
-TARGET_WINDOW_WIDTH = 1280
-TARGET_FPS = 60
-TARGET_MONITOR_NUM = 1
+DEFAULT_SHOW_FPS_COUNTER = True
+DEFAULT_SHOW_STEPS_COUNTER = False
 
-WALL_COLOUR = [32, 160, 32]
-SOLUTION_TILE_COLOUR = [32, 32, 240]
-BACKGROUND_COLOUR = [240, 250, 250]
-ENTRANCE_TILE_COLOUR = [40, 200, 40]
-EXIT_TILE_COLOUR = [200, 40, 40]
+DEFAULT_TARGET_ASPECT_RATIO = [16, 9]
+DEFAULT_TARGET_WINDOW_WIDTH = 1280
+DEFAULT_TARGET_FPS = 60
+DEFAULT_TARGET_MONITOR_NUM = 1
 
-FPS_COUNTER_COLOUR = [4, 4, 4]
-FPS_COUNTER_SIZE = 24 
-FPS_FONT = pygame.font.Font(None, FPS_COUNTER_SIZE)
+DEFAULT_WALL_COLOUR = [32, 160, 32]
+DEFAULT_SOLUTION_TILE_COLOUR = [32, 32, 240]
+DEFAULT_BACKGROUND_COLOUR = [240, 250, 250]
+DEFAULT_ENTRANCE_TILE_COLOUR = [40, 200, 40]
+DEFAULT_EXIT_TILE_COLOUR = [200, 40, 40]
+
+DEFAULT_FPS_COUNTER_COLOUR = [4, 4, 4]
+DEFAULT_FPS_COUNTER_SIZE = 24 
+DEFAULT_FPS_FONT = pygame.font.Font(None, DEFAULT_FPS_COUNTER_SIZE)
 
 
-STEP_COLOUR = [4, 4, 4]
-STEP_SIZE = 24 
-STEP_FONT = pygame.font.Font(None, STEP_SIZE)
+DEFAULT_STEP_COLOUR = [4, 4, 4]
+DEFAULT_STEP_SIZE = 24 
+DEFAULT_STEP_FONT = pygame.font.Font(None, DEFAULT_STEP_SIZE)
+
+
+
+class GraphicsAppOptionsConfigurer:
+    def __init__(self) -> None:
+        self.target_fps = DEFAULT_TARGET_FPS
+        self.show_fps_counter = DEFAULT_SHOW_FPS_COUNTER
+        self.show_step_counter = DEFAULT_SHOW_STEPS_COUNTER
+        self.wall_colour = DEFAULT_WALL_COLOUR
+        self.background_colour = DEFAULT_BACKGROUND_COLOUR
+        self.entrance_colour = DEFAULT_ENTRANCE_TILE_COLOUR
+        self.exit_colour = DEFAULT_EXIT_TILE_COLOUR
+        self.solution_colour = DEFAULT_SOLUTION_TILE_COLOUR
+        self.aspect_ratio = DEFAULT_TARGET_ASPECT_RATIO
+        self.window_width = DEFAULT_TARGET_WINDOW_WIDTH
 
 
 
@@ -38,6 +56,8 @@ class GraphicsApp:
     def __init__(self, maze: Maze, maze_solver: SolvingAlgorithm = None) -> None:
         self.maze = maze
         self.maze_solver = maze_solver
+
+        self._options = GraphicsAppOptionsConfigurer()
 
         self.window_size = self._get_window_size()
         self.window: pygame.Surface
@@ -62,20 +82,29 @@ class GraphicsApp:
         self._reset_keys()
 
 
+
+    def configure(self, **kwargs):
+        for key in kwargs.keys():
+            setattr(self._options, key, kwargs[key])
+
+    def get_configure_options(self):
+        return list(self._options.__dict__.keys())
+
+
     def _get_draw_properties(self, window: pygame.Surface, maze: Maze) -> DrawProperties:
         output = DrawProperties()
-        output.configure_properties(window, maze)
+        output.configure_properties(window, maze, self._options)
         return output
     
     def _late_display_update(self, draw_properties: DrawProperties):
         pygame.display.update()
-        self.window.fill(BACKGROUND_COLOUR)
-        draw_properties.surface.fill(BACKGROUND_COLOUR)
+        self.window.fill(self._options.background_colour)
+        draw_properties.surface.fill(self._options.background_colour)
 
     def _get_window_size(self) -> List[int]:
-        monitor_size = pygame.display.get_desktop_sizes()[TARGET_MONITOR_NUM - 1]
-        window_width = int(min(TARGET_WINDOW_WIDTH, monitor_size[0] * 9 / 10 ))
-        return [window_width, int(window_width / TARGET_ASPECT_RATIO[0] * TARGET_ASPECT_RATIO[1])]
+        monitor_size = pygame.display.get_desktop_sizes()[DEFAULT_TARGET_MONITOR_NUM - 1]
+        window_width = int(min(self._options.window_width, monitor_size[0] * 9 / 10 ))
+        return [window_width, int(window_width / self._options.aspect_ratio[0] * self._options.aspect_ratio[1])]
 
     def run(self):
         self.window = pygame.display.set_mode(self.window_size)
@@ -86,7 +115,7 @@ class GraphicsApp:
         while self.running:
 
             self._event_loop()
-            self._ticks = self._clock.tick(TARGET_FPS)
+            self._ticks = self._clock.tick(self._options.target_fps)
 
             self._handle_solver_step_calls()
 
@@ -95,8 +124,9 @@ class GraphicsApp:
                 DrawMaze.draw_maze_solution(self.maze_solver, draw_properties)
             self.window.blit(draw_properties.surface, draw_properties.surface_offset)
             
-            DrawMaze.draw_steps_per_second(self.window, self._step_calls_per_second)
+            
             DrawMaze.draw_fps_counter(self.window, self._ticks)
+            DrawMaze.draw_steps_per_second(self.window, self._step_calls_per_second)
 
             self._late_display_update(draw_properties)
 
@@ -220,31 +250,36 @@ class DrawMaze:
     @classmethod
     def draw_fps_counter(cls, window: pygame.Surface, ticks: int):
         fps = int(1000 / max(1, ticks))
-        fps_surface = FPS_FONT.render(f"FPS: {fps} ({int(ticks)}ms)", True, FPS_COUNTER_COLOUR, [200, 200, 200])
-        window.blit(fps_surface, [window.get_width() - 180, FPS_COUNTER_SIZE])
+        fps_surface = DEFAULT_FPS_FONT.render(f"FPS: {fps} ({int(ticks)}ms)", True, DEFAULT_FPS_COUNTER_COLOUR, [200, 200, 200])
+        window.blit(fps_surface, [window.get_width() - 180, DEFAULT_FPS_COUNTER_SIZE])
     
     @classmethod
     def draw_steps_per_second(cls, window: pygame.Surface, steps: int):
-        step_surface = FPS_FONT.render(f"Target Steps per Second: {steps}", True, STEP_COLOUR, [200, 200, 200])
-        window.blit(step_surface, [window.get_width() - 240, STEP_SIZE * 2.5])
+        step_surface = DEFAULT_FPS_FONT.render(f"Target Steps per Second: {steps}", True, DEFAULT_STEP_COLOUR, [200, 200, 200])
+        window.blit(step_surface, [window.get_width() - 240, DEFAULT_STEP_SIZE * 2.5])
     
     @classmethod
     def draw_maze(cls, maze: Maze, draw_properties: DrawProperties):
 
+        surface = draw_properties.surface
+        wall_colour = draw_properties.wall_colour
+        wall_width = draw_properties.wall_width
+        tile_size = draw_properties.tile_size
+
         for node in maze.maze_body:
             if node.walls & TOP_WALL: 
-                cls._draw_top_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)
+                cls._draw_top_wall(surface, wall_colour, node.x, node.y, wall_width, tile_size)
             if node.walls & BOTTOM_WALL : 
-                cls._draw_bottom_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)
+                cls._draw_bottom_wall(surface, wall_colour, node.x, node.y, wall_width, tile_size)
             if node.walls & LEFT_WALL: 
-                cls._draw_left_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)
+                cls._draw_left_wall(surface, wall_colour, node.x, node.y, wall_width, tile_size)
             if node.walls & RIGHT_WALL: 
-                cls._draw_right_wall(draw_properties.surface, node.x, node.y, draw_properties.wall_width, draw_properties.tile_size)   
+                cls._draw_right_wall(surface, wall_colour, node.x, node.y, wall_width, tile_size)   
         
-        cls._draw_end(draw_properties.surface, ENTRANCE_TILE_COLOUR, maze.entrance_node.x - 1, maze.entrance_node.y,
-                           draw_properties.wall_width, draw_properties.tile_size)
-        cls._draw_end(draw_properties.surface, EXIT_TILE_COLOUR, maze.exit_node.x - 1, maze.exit_node.y,
-                           draw_properties.wall_width, draw_properties.tile_size)
+        cls._draw_end(surface, draw_properties.entrance_colour, maze.entrance_node.x - 1, maze.entrance_node.y,
+                        wall_width, tile_size)
+        cls._draw_end(surface, draw_properties.exit_colour, maze.exit_node.x - 1, maze.exit_node.y,
+                        wall_width, tile_size)
     
     @classmethod
     def draw_maze_solution(cls, maze_solver: SolvingAlgorithm, draw_properties: DrawProperties):
@@ -262,40 +297,40 @@ class DrawMaze:
         for node in solution:
             position = [node.x * draw_properties.tile_size + ((draw_properties.tile_size + draw_properties.wall_width) // 2),
              draw_properties.surface.get_height() - ((node.y + 1) * draw_properties.tile_size) + ((draw_properties.tile_size - draw_properties.wall_width) // 2)]
-            pygame.draw.circle(draw_properties.surface, SOLUTION_TILE_COLOUR, position, solution_circle_size)
+            pygame.draw.circle(draw_properties.surface, draw_properties.solution_colour, position, solution_circle_size)
 
 
     @staticmethod
-    def _draw_top_wall(window: pygame.Surface, x: int, y: int, wall_width: int,
+    def _draw_top_wall(window: pygame.Surface, wall_colour: List[int], x: int, y: int, wall_width: int,
      tile_size: int):
         position = [x * tile_size + wall_width, window.get_height() - ((y + 1) * tile_size) - wall_width]
         wall_dimensions = [tile_size - wall_width, wall_width]
 
-        pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
+        pygame.draw.rect(window, wall_colour, [*position, *wall_dimensions])
 
     @staticmethod
-    def _draw_bottom_wall(window: pygame.Surface, x: int, y: int, wall_width: int,
+    def _draw_bottom_wall(window: pygame.Surface, wall_colour: List[int], x: int, y: int, wall_width: int,
      tile_size: int):
         position = [x * tile_size + wall_width, window.get_height() - (y * tile_size) - wall_width]
         wall_dimensions = [tile_size - wall_width, wall_width]
 
-        pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
+        pygame.draw.rect(window, wall_colour, [*position, *wall_dimensions])
     
     @staticmethod
-    def _draw_left_wall(window: pygame.Surface, x: int, y: int, wall_width: int,
+    def _draw_left_wall(window: pygame.Surface, wall_colour: List[int], x: int, y: int, wall_width: int,
      tile_size: int):
         position = [x * tile_size, window.get_height() - ((y + 1) * tile_size)]
         wall_dimensions = [wall_width, tile_size - wall_width]
 
-        pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
+        pygame.draw.rect(window, wall_colour, [*position, *wall_dimensions])
 
     @staticmethod
-    def _draw_right_wall(window: pygame.Surface, x: int, y: int, wall_width: int,
+    def _draw_right_wall(window: pygame.Surface, wall_colour: List[int], x: int, y: int, wall_width: int,
      tile_size: int):
         position = [x * tile_size + tile_size, window.get_height() - (y + 1) * tile_size]
         wall_dimensions = [wall_width, tile_size - wall_width]
 
-        pygame.draw.rect(window, WALL_COLOUR, [*position, *wall_dimensions])
+        pygame.draw.rect(window, wall_colour, [*position, *wall_dimensions])
 
 
     @staticmethod
@@ -313,7 +348,13 @@ class DrawProperties:
         self.surface_offset: List[int]
         self.surface: pygame.surface.Surface
 
-    def configure_properties(self, window: pygame.surface.Surface, maze: Maze):
+        self.entrance_colour: List[int]
+        self.exit_colour: List[int]
+        self.solution_colour: List[int]
+        self.wall_colour: List[int]
+
+    def configure_properties(self, window: pygame.surface.Surface, maze: Maze,
+                              app_options: GraphicsAppOptionsConfigurer):
         self.tile_size = self._get_tile_size(maze.w, maze.h, window.get_width(),
          window.get_height())
 
@@ -324,6 +365,11 @@ class DrawProperties:
 
         
         self.surface = pygame.Surface([window.get_width() - self.surface_offset[0] + 1, window.get_height()])
+
+        self.entrance_colour = app_options.entrance_colour
+        self.exit_colour = app_options.exit_colour
+        self.solution_colour = app_options.solution_colour
+        self.wall_colour = app_options.wall_colour
 
 
     @staticmethod
