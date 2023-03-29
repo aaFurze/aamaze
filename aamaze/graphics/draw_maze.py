@@ -59,7 +59,6 @@ class GraphicsApp:
 
         self._options = GraphicsAppOptionsConfigurer()
 
-        self.window_size = self._get_window_size()
         self.window: pygame.Surface
 
         self.running = True
@@ -82,13 +81,14 @@ class GraphicsApp:
         self._reset_keys()
 
 
+    @property
+    def option_list(self):
+        return list(self._options.__dict__.keys())
+
 
     def configure(self, **kwargs):
         for key in kwargs.keys():
             setattr(self._options, key, kwargs[key])
-
-    def get_configure_options(self):
-        return list(self._options.__dict__.keys())
 
 
     def _get_draw_properties(self, window: pygame.Surface, maze: Maze) -> DrawProperties:
@@ -107,8 +107,8 @@ class GraphicsApp:
         return [window_width, int(window_width / self._options.aspect_ratio[0] * self._options.aspect_ratio[1])]
 
     def run(self):
-        self.window = pygame.display.set_mode(self.window_size)
-        print(f"Running Graphics App (window size = {self.window_size})")
+        self.window = pygame.display.set_mode(self._get_window_size())
+        print(f"Running Graphics App (window size = {self.window.get_size()})")
 
         draw_properties = self._get_draw_properties(self.window, self.maze)
 
@@ -124,9 +124,9 @@ class GraphicsApp:
                 DrawMaze.draw_maze_solution(self.maze_solver, draw_properties)
             self.window.blit(draw_properties.surface, draw_properties.surface_offset)
             
-            
-            DrawMaze.draw_fps_counter(self.window, self._ticks)
-            DrawMaze.draw_steps_per_second(self.window, self._step_calls_per_second)
+
+            if self._options.show_fps_counter: DrawMaze.draw_fps_counter(self.window, self._ticks)
+            if self._options.show_step_counter: DrawMaze.draw_steps_per_second(self.window, self._step_calls_per_second)
 
             self._late_display_update(draw_properties)
 
@@ -218,16 +218,12 @@ class GraphicsApp:
                 elif event.dict["text"] == "-":
                     self._decrease_steps()
                 
-
-            
-
     def _reset_keys(self):
         self.k_space = False
         self.k_s = False
         self.k_r = False
         self.k_plus = False
         self.k_minus = False
-
 
     def _enable_key(self, key_code: int):
         if key_code == pygame.K_SPACE:

@@ -16,7 +16,7 @@ from aamaze.solving.flood_fill import FloodFillSolutionCheck
 
 def run():
 
-    test_maze = Maze(64, 64, start_filled=True, entrance_index=150, exit_index=-30)
+    test_maze = Maze(32, 32, start_filled=True, entrance_index=150, exit_index=-30)
     # RecursiveDivisorGenerationAlgorithm(test_maze).generate_maze()
     EllersGenerationAlgorithm(test_maze).generate_maze()
     # KruskalsGenerationAlgorithm(test_maze).generate_maze()
@@ -39,6 +39,10 @@ def run():
     print(len(solution.solution))
 
     app = GraphicsApp(test_maze, solution)
+    print(app.option_list)
+    app.configure(wall_colour=[0, 0, 0], show_fps_counter=True, show_step_counter=True,
+                  background_colour=[100, 100, 200], solution_colour=[200, 200, 32],
+                    entrance_colour=[32, 200, 200], exit_colour=[60, 100, 50], aspect_ratio=[16, 9], window_width=1600, target_fps=500)
     app.run()
 
 
