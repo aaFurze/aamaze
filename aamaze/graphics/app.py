@@ -167,6 +167,8 @@ class GraphicsAppOptionsConfigurer:
 
 
 class MazeGenerationManipulator:
+    _increment_bounds = {2000: 250, 1000: 100, 500: 50, 100: 25, 50: 10, 20: 5, 10: 2, 1: 1}
+
     def __init__(self, maze_solver: SolvingAlgorithm) -> None:
         self.maze_solver = maze_solver
 
@@ -176,21 +178,11 @@ class MazeGenerationManipulator:
         self.run_steps = True
 
     def decrease_steps(self):
-        if self._step_calls_per_second > 2000:
-            self._step_calls_per_second -= 250
-        elif self._step_calls_per_second > 1000:
-            self._step_calls_per_second -= 100
-        elif self._step_calls_per_second > 500:
-            self._step_calls_per_second -= 50
-        elif self._step_calls_per_second > 100:
-            self._step_calls_per_second -= 25
-        elif self._step_calls_per_second > 50:
-            self._step_calls_per_second -= 10
-        elif self._step_calls_per_second > 20:
-            self._step_calls_per_second -= 5
-        elif self._step_calls_per_second > 10:
-            self._step_calls_per_second -= 2
-        else: self._step_calls_per_second -= 1
+
+        for bound_increment in self._increment_bounds.items():
+            if self._step_calls_per_second > bound_increment[0]:
+                self._step_calls_per_second -= bound_increment[1]
+                break
 
         self.set_steps_per_second(self._step_calls_per_second)
 
@@ -206,21 +198,11 @@ class MazeGenerationManipulator:
             self._step_call_counter -= self._step_call_increment
 
     def increase_steps(self):
-        if self._step_calls_per_second >= 2000:
-            self._step_calls_per_second += 250
-        elif self._step_calls_per_second >= 1000:
-            self._step_calls_per_second += 100
-        elif self._step_calls_per_second >= 500:
-            self._step_calls_per_second += 50
-        elif self._step_calls_per_second >= 100:
-            self._step_calls_per_second += 25
-        elif self._step_calls_per_second >= 50:
-            self._step_calls_per_second += 10
-        elif self._step_calls_per_second >= 20:
-            self._step_calls_per_second += 5
-        elif self._step_calls_per_second >= 10:
-            self._step_calls_per_second += 2
-        else: self._step_calls_per_second += 1
+
+        for bound_increment in self._increment_bounds.items():
+            if self._step_calls_per_second >= bound_increment[0]:
+                self._step_calls_per_second += bound_increment[1]
+                break
 
         self.set_steps_per_second(self._step_calls_per_second)
 
@@ -235,15 +217,11 @@ class MazeGenerationManipulator:
     
     def set_steps_per_second(self, value):
         self._step_calls_per_second = max(1, min(5000, value))
-        if self._step_calls_per_second <= 10: self._round_steps_per_second(1)
-        elif self._step_calls_per_second <= 20: self._round_steps_per_second(2)
-        elif self._step_calls_per_second <= 50: self._round_steps_per_second(5)
-        elif self._step_calls_per_second <= 100: self._round_steps_per_second(10)
-        elif self._step_calls_per_second <= 500: self._round_steps_per_second(25)
-        elif self._step_calls_per_second <= 1000: self._round_steps_per_second(50)
-        elif self._step_calls_per_second <= 2000: self._round_steps_per_second(100)
-        else: self._round_steps_per_second(250)
 
+        for bound_increment in self._increment_bounds.items():
+            if self._step_calls_per_second >= bound_increment[0]:
+                self._round_steps_per_second(bound_increment[1])
+                break
 
         self._step_call_increment = 1000 / self._step_calls_per_second
 
