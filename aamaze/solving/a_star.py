@@ -5,7 +5,7 @@ from typing import List
 from aamaze.base_maze import Maze, MazeNode, SolvingAlgorithm
 
 
-class AStarSolvingAlgorithm(SolvingAlgorithm):
+class AStarSolver(SolvingAlgorithm):
     def __init__(self, maze: Maze) -> None:
         self.maze = maze
 

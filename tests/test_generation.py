@@ -1,22 +1,17 @@
 import pytest
 
 from aamaze.base_maze import GenerationAlgorithm, Maze
-from aamaze.generation import (EllersGenerationAlgorithm,
-                               GrowingTreeGenerationAlgorithm,
-                               KruskalsGenerationAlgorithm,
-                               PrimsGenerationAlgorithm,
-                               RecursiveBacktrackerAlgorithm,
-                               RecursiveDivisorGenerationAlgorithm,
-                               WilsonsGenerationAlgorithm)
-from aamaze.solving import AStarSolvingAlgorithm, FloodFillSolutionCheck
+from aamaze.generation import (Eller, GrowingTree, Kruskals, Prims,
+                               RecursiveBacktracker, RecursiveDivisor, Wilsons)
+from aamaze.solving import AStarSolver, FloodFillSolutionCheck
 
 # Maze needs to start filled for algorithm to work.
 start_filled_algorithms = [
-    KruskalsGenerationAlgorithm, PrimsGenerationAlgorithm,
-    RecursiveBacktrackerAlgorithm, WilsonsGenerationAlgorithm, GrowingTreeGenerationAlgorithm, EllersGenerationAlgorithm
+    Kruskals, Prims,
+    RecursiveBacktracker, Wilsons, GrowingTree, Eller
 ]
 # Maze needs to start empty for algorithm to work.
-start_empty_algorithms = [RecursiveDivisorGenerationAlgorithm]
+start_empty_algorithms = [RecursiveDivisor]
 
 
 algorithms = start_empty_algorithms + start_filled_algorithms
@@ -45,7 +40,7 @@ class TestGenerationAlgorithms:
         maze_generator: GenerationAlgorithm = generation_algorithm_maze_size_pairs[index][0](maze)
         maze_generator.generate_maze()
 
-        solver = AStarSolvingAlgorithm(maze)
+        solver = AStarSolver(maze)
         solver.solve_maze()
 
         assert solver.solved
@@ -56,7 +51,7 @@ class TestGenerationAlgorithms:
         maze_generator: GenerationAlgorithm = generation_algorithm_maze_size_pairs[index][0](maze)
         maze_generator.generate_maze()
 
-        solver = AStarSolvingAlgorithm(maze)
+        solver = AStarSolver(maze)
         solver.solve_maze()
 
         assert len(solver.solution) >= sum(generation_algorithm_maze_size_pairs[index][1]) - 1

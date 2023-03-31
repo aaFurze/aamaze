@@ -4,7 +4,7 @@ from typing import Dict, List
 from aamaze.base_maze import GenerationAlgorithm, Maze, MazeNode
 
 
-class PrimsGenerationAlgorithm(GenerationAlgorithm):
+class Prims(GenerationAlgorithm):
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
 

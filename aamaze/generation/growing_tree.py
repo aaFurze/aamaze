@@ -4,7 +4,7 @@ from typing import List, Union
 from aamaze.base_maze import GenerationAlgorithm, Maze, MazeNode
 
 
-class GrowingTreeGenerationAlgorithm(GenerationAlgorithm):
+class GrowingTree(GenerationAlgorithm):
     def __init__(self, maze: Maze, mode: str = "random") -> None:
         super().__init__(maze)
 

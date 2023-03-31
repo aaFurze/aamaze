@@ -1,3 +1,3 @@
-from .a_star import AStarSolvingAlgorithm
-from .dijkstra import DijkstraSolvingAlgorithm
+from .a_star import AStarSolver
+from .dijkstra import DijkstraSolver
 from .flood_fill import FloodFillSolutionCheck

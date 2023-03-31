@@ -4,7 +4,7 @@ from typing import Dict, List
 from aamaze.base_maze import Maze, MazeNode, SolvingAlgorithm
 
 
-class DijkstraSolvingAlgorithm(SolvingAlgorithm):
+class DijkstraSolver(SolvingAlgorithm):
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
 

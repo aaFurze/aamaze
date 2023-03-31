@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aamaze"
-version = "0.3.0"
+version = "0.3.1"
 description = "A python package for generating, solving and displaying mazes."
 authors = ["aaFurze <aafurze@gmail.com>"]
 license = "MIT"

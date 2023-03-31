@@ -4,7 +4,7 @@ from typing import List
 from aamaze.base_maze import GenerationAlgorithm, Maze, MazeNode
 
 
-class WilsonsGenerationAlgorithm(GenerationAlgorithm):
+class Wilsons(GenerationAlgorithm):
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
     

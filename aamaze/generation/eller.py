@@ -7,7 +7,7 @@ from aamaze.base_maze import (BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, TOP_WALL,
                               GenerationAlgorithm, Maze, MazeNode)
 
 
-class EllersGenerationAlgorithm(GenerationAlgorithm):
+class Eller(GenerationAlgorithm):
     def __init__(self, maze: Maze) -> None:
         super().__init__(maze)
     

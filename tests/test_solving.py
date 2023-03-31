@@ -1,34 +1,32 @@
 import pytest
 
-from aamaze.base_maze import Maze, MazeNode, SolvingAlgorithm
-from aamaze.generation import (KruskalsGenerationAlgorithm,
-                               RecursiveBacktrackerAlgorithm)
-from aamaze.solving import (AStarSolvingAlgorithm, DijkstraSolvingAlgorithm,
-                            FloodFillSolutionCheck)
+from aamaze.base_maze import Maze, SolvingAlgorithm
+from aamaze.generation import Kruskals, RecursiveBacktracker
+from aamaze.solving import AStarSolver, DijkstraSolver, FloodFillSolutionCheck
 
 
 @pytest.fixture(scope="module")
 def kruskal_maze_32() -> Maze:
     maze = Maze(32, 32)
-    KruskalsGenerationAlgorithm(maze).generate_maze()
+    Kruskals(maze).generate_maze()
     return maze
 
 @pytest.fixture(scope="module")
 def recursive_backtracker_maze_32() -> Maze:
     maze = Maze(32, 32)
-    RecursiveBacktrackerAlgorithm(maze).generate_maze()
+    RecursiveBacktracker(maze).generate_maze()
     return maze
 
 @pytest.fixture(scope="module")
 def kruskal_maze_8() -> Maze:
     maze = Maze(8, 8)
-    KruskalsGenerationAlgorithm(maze).generate_maze()
+    Kruskals(maze).generate_maze()
     return maze
 
 @pytest.fixture(scope="module")
 def recursive_backtracker_maze_8() -> Maze:
     maze = Maze(8, 8)
-    RecursiveBacktrackerAlgorithm(maze).generate_maze()
+    RecursiveBacktracker(maze).generate_maze()
     return maze
 
 
@@ -45,10 +43,16 @@ def recursive_backtracker_32_flood_filled(recursive_backtracker_maze_32) -> Floo
     flood_fill.solve_maze()
     return flood_fill
 
+@pytest.fixture(scope="module")
+def kruskals_no_outer_exits_16():
+    maze = Maze(16, 16, entrance_index=18, exit_index=-20)
+    Kruskals(maze).generate_maze()
+    return maze
 
 
-solving_algorithms = [AStarSolvingAlgorithm,
-                       DijkstraSolvingAlgorithm,
+
+solving_algorithms = [AStarSolver,
+                       DijkstraSolver,
                        FloodFillSolutionCheck
                        ]
 
@@ -97,10 +101,16 @@ class TestCommonSolving:
     @pytest.mark.parametrize("index, maze_size", [[i, j] for i in range(len(solving_algorithms)) for j in range(1, 3)])
     def test_solvers_work_on_small_maze(self, index: int, maze_size: int):
         maze = Maze(maze_size, maze_size)
-        KruskalsGenerationAlgorithm(maze).generate_maze()
+        Kruskals(maze).generate_maze()
         solver: SolvingAlgorithm = solving_algorithms[index](maze)
         solver.solve_maze()
 
+        assert solver.solved
+
+    @pytest.mark.parametrize("index", [i for i in range(len(solving_algorithms))])
+    def test_solvers_work_on_mazes_with_inner_entrance_exit(self, index: int, kruskals_no_outer_exits_16):
+        solver: SolvingAlgorithm = solving_algorithms[index](kruskals_no_outer_exits_16)
+        solver.solve_maze()
         assert solver.solved
 
 
