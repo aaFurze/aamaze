@@ -1,4 +1,5 @@
 # maze-package
 A collection of maze generation and solving algorithms
 
-![Build Status](https://github.com/aaFurze/aamaze/tests/reports/tests-badge.svg)
+![Tests](https://github.com/aaFurze/aamaze/blob/main/tests/reports/tests-badge.svg)
+![Coverage](https://github.com/aaFurze/aamaze/blob/main/tests/reports/coverage-badge.svg)
