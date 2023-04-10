@@ -39,11 +39,11 @@ To check that all the packages have been installed, run the following command:
 ```
 pip list
 ```
-This should produce an output that looks contains these items
+This should produce an output that contains these items
 ```
 Package    Version
 ---------- -------
-aamaze     0.3.1
+aamaze     latest_version
 pip        20.2.3
 pygame     2.3.0
 setuptools 49.2.1
@@ -55,5 +55,67 @@ You are now ready to make Mazes!
 
 # Using the Package
 
+
+
+### Supported Algorithms
+##### Generating Algorithms
+ - Eller
+ - GrowingTree
+ - Kruskals
+ - Prims
+ - RecursiveBacktracker
+ - _RecursiveDivisor_
+ - Wilsons
+
+All Generation algorithms (with the exception of RecursiveDivisor) require a maze with all walls filled _(start_filled=True)_
+
+##### Solving Algorithms
+ - AStarSolver
+ - DijkstraSolver
+ - FloodFillSolutionCheck
+
+AStarSolver and DijkstraSolver find the shortest path between a Maze's entrance and exit. FloodFillSolutionCheck checks to see if every node in a maze can be reached from every other node.
+
+### Basic use case: Create a Maze and Solution
+
+Creating a Maze and Solution to a Maze can be done in the following way:
+
+ 1. Create a new Maze Object (In this case a 20x10 Maze)
+```
+from aamaze import Maze
+maze = Maze(20, 10, start_filled=True, entrance_index=0, exit_index=-1)
+```
+ 2. Create a new GenerationAlgorithm Object
+ 3. Run the "generate_maze" method on GenerationAlgorithm Object
+```
+from aamaze.generation import X_GeneratingAlgorithm
+X_GenerationAlgorithm(maze).generate_maze()
+```
+ 4. Create a new SolvingAlgorithm
+ 5. Run the "solve_maze" method on SolvingAlgorithm Object
+```
+from aamaze.solving import Y_SolvingAlgorithm
+maze_solver = Y_SolvingAlgorithm(maze)
+maze_solver.solve_maze()
+```
+
+The Objects you want to keep in this case are "maze" and "maze_solver". The GenerationAlgorithm can be safely discarded once its "generate_maze" has been run.
+
+
+### Basic use case: Displaying a Maze and its solution 
+
+To display a maze and its _solution (optional)_:
+ 1. Generate maze and solution Objects (as shown in _Basic use case: Create a Maze and Solution_).
+ 2. Create a GraphicsApp Object
+```
+from aamaze import GraphicsApp
+app = GraphicsApp()
+```
+ 3. Call the "run" method on the GraphicsApp Object
+``` 
+app.run()
+```
+
+Calling "app.run()" should open a new pygame Window that displays the Maze and its associated Solution (if a solution object is provided).
 
 END
