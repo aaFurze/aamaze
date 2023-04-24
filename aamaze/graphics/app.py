@@ -151,18 +151,18 @@ class GraphicsApp:
 
 class GraphicsAppOptionsConfigurer:
     def __init__(self) -> None:
-        self.target_fps = DEFAULT_TARGET_FPS
-        self.show_fps_counter = DEFAULT_SHOW_FPS_COUNTER
-        self.show_step_counter = DEFAULT_SHOW_STEPS_COUNTER
-        self.wall_colour = DEFAULT_WALL_COLOUR
+        self.aspect_ratio = DEFAULT_TARGET_ASPECT_RATIO
         self.background_colour = DEFAULT_BACKGROUND_COLOUR
         self.entrance_colour = DEFAULT_ENTRANCE_TILE_COLOUR
         self.exit_colour = DEFAULT_EXIT_TILE_COLOUR
+        self.show_fps_counter = DEFAULT_SHOW_FPS_COUNTER
+        self.show_step_counter = DEFAULT_SHOW_STEPS_COUNTER
         self.solution_colour = DEFAULT_SOLUTION_TILE_COLOUR
-        self.aspect_ratio = DEFAULT_TARGET_ASPECT_RATIO
-        self.window_width = DEFAULT_TARGET_WINDOW_WIDTH
         self.start_paused = DEFAULT_START_PAUSED
+        self.target_fps = DEFAULT_TARGET_FPS
         self.target_steps_per_second = DEFAULT_TARGET_STEPS_PER_SECOND
+        self.wall_colour = DEFAULT_WALL_COLOUR
+        self.window_width = DEFAULT_TARGET_WINDOW_WIDTH
 
 
 

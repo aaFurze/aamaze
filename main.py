@@ -21,7 +21,7 @@ def run():
     # Prims(test_maze).generate_maze()
     # RecursiveBacktracker(test_maze).generate_maze()
     # Wilsons(test_maze).generate_maze()
-    GrowingTree(test_maze, mode="random-newest-split-50").generate_maze()
+    GrowingTree(test_maze, mode="random-newest-split-99").generate_maze()
     print("Generated Maze")
 
 
@@ -38,6 +38,7 @@ def run():
 
     app = GraphicsApp(test_maze, solution)
     print(app.option_list)
+    print(app._options.target_steps_per_second)
     app.configure(show_step_counter=True, start_paused=True, target_steps_per_second=50)
     app.run()
 
