@@ -133,7 +133,7 @@ To display a maze and its _solution (optional)_:
  2. Create a GraphicsApp Object
 ```
 from aamaze import GraphicsApp
-app = GraphicsApp()
+app = GraphicsApp(maze, solver)   # solver is optional
 ```
  3. Call the "run" method on the GraphicsApp Object
 ``` 
@@ -161,7 +161,7 @@ maze_solver = Y_SolvingAlgorithm(maze)
 2. Create a GraphicsApp object
 ```
 from aamaze import GraphicsApp
-app = GraphicsApp()
+app = GraphicsApp(maze, maze_solver)
 ```
 3. (Optional) Configure whether a solution starts to be generated as soon as "app.run()" is called (start_paused), and the speed of generation (target_steps_per_second). By default, start_paused=False, target_steps_per_second=50
 ```
@@ -189,7 +189,7 @@ Controls for manipulating the solving algorithm at runtime are:
 Below are all options that can be set using the app.configure() method. Options are always set using keyword args (var_x = val_y). Multiple options can be set in the same app.configure call. Available options can be printed via accessing the ".options_list" property of a GraphicsApp object instance.
 Examples:
 ```
-# app = GraphicsApp instance
+app = GraphicsApp(maze)
 
 
 app.configure(aspect_ratio=[16, 10])
@@ -236,8 +236,8 @@ Currently, GrowingTree is a special GeneratingAlgorithm that allows for editing 
 
 See implementation below:
 ```
-test_maze = Maze(16, 16, start_filled=True)                   # Creating 16x16 maze
-growing_tree = GrowingTree(test_maze)                         # Created GrowingTree instance
+maze = Maze(16, 16, start_filled=True)                        # Creating 16x16 maze
+growing_tree = GrowingTree(maze)                              # Created GrowingTree instance
 
 growing_tree.node_selection_mode = "random"                   # Randomly select node
 growing_tree.node_selection_mode = "newest"                   # Select newest node with unvisited neighbour
