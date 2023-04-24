@@ -1,25 +1,46 @@
 # maze-package
-A collection of maze generation and solving algorithms
+A python package for generating, solving and displaying mazes.
 
 ![Tests](https://github.com/aaFurze/aamaze/blob/main/tests/reports/tests-badge.svg)
 ![Coverage](https://github.com/aaFurze/aamaze/blob/main/tests/reports/coverage-badge.svg)
 
 <br/>
-<br/>
 
-### Pre-requisites/Requirements to use the Package
+## Contents
+ - **Setup**
+   - **Pre-requisites/Requirements to use the Package**
+   - **Setting up the Virtual Environment**
+   - **Installing Dependencies (User Build)**
+     - Poetry
+     - setup.py
+     
+  - **Using the Package**
+    - **Supported Algorithms**
+      - Generating Algorithms
+      - Solving Algorithms
+    - **Basic use case: Create a Maze and Solution**
+    - **Generating a Maze solution at runtime**
+    - **Manipulating the solving algorithm at runtime**
+    - **Configuring GraphicsApp**
+      - Option input types Key
+      - Full list of options
+    - **Other functionality**
+      - Configuring the GrowingTree Maze Generation Algorithm
+
+# Setup
+## Pre-requisites/Requirements to use the Package
 
 - Python version 3.7+ (Program originally written using Python 3.9 interpreter)
 
-### Setting up the Virtual Environment
+## Setting up the Virtual Environment
 It is good practice to create a virtual environment for this project (and for any other project with non-standard-library dependencies).
 See this guide for how to setup and activate a virtual environment: [Python docs](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment "Python docs")
 
-NOTE: Ensure that you activate the environment once you have created it (See Python docs)
+_NOTE: Ensure that you activate the environment once you have created it (See Python docs)_
+<br/>
 
-
-### Installing Dependencies (User Build)
-Note: This guide assumes you are in the root project directory.
+## Installing Dependencies (User Build)
+_Note: This guide assumes you are in the root project directory_
 
 #### Poetry
 If you have poetry installed on your machine, simply run poetry install.
@@ -54,7 +75,6 @@ You are now ready to make Mazes!
 <br/>
 
 # Using the Package
-<br/>
 <br/>
 
 ### Supported Algorithms
@@ -189,7 +209,7 @@ app.configure(window_width=1600, wall_colour=[0, 0, 0], show_fps_counter=True)
   - e.g. 0, 253, 1000000
 <br/>
 
-#### Full list of options.
+#### Full list of options
 
  - **aspect_ratio:** Sets the aspect ratio that the GraphicsApp window will open at (e.g. [16, 9]). - **Pair of Numbers**
  - **background_colour:** Sets the background colour of the GraphicsApp window (e.g. [200, 200, 205]). - **Colour**
@@ -205,5 +225,26 @@ app.configure(window_width=1600, wall_colour=[0, 0, 0], show_fps_counter=True)
  - **window_width:** Sets the width of the GraphicsApp window - **Positive Integer**
 <br/>
 <br/>
+
+### Other functionality
+
+#### Configuring the GrowingTree Maze Generation Algorithm
+Currently, GrowingTree is a special GeneratingAlgorithm that allows for editing how a maze is generated. This can be done by setting the **node_selection_mode** attribute to one of three values
+ - **random**                   - The next path will start at a random node that has already been visited (approximates Prims Algorithm)
+ - **newest**                   - The next path will start at the most recently visited node that still has an unvisited neighbour (approximates Recursive Backtracker Algorithm)
+ - **random-newest-split-x**    - The next path has an **x**% probability to start from a random node, and an **x-100**% chance of starting from the most recently visited node with an unvisited neighbour.
+
+See implementation below:
+```
+test_maze = Maze(16, 16, start_filled=True)                   # Creating 16x16 maze
+growing_tree = GrowingTree(test_maze)                         # Created GrowingTree instance
+
+growing_tree.node_selection_mode = "random"                   # Randomly select node
+growing_tree.node_selection_mode = "newest"                   # Select newest node with unvisited neighbour
+
+growing_tree.node_selection_mode = "random-newest-split-25"   # 25% chance random, 75% change newest
+growing_tree.node_selection_mode = "random-newest-split-50"   # 50% chance random, 50% change newest
+growing_tree.node_selection_mode = "random-newest-split-98"   # 2% chance random, 98% change newest
+```
 
 END
